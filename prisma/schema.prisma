@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum DocumentType {
+  FORM_106
+}
+
+enum DocumentStatus {
+  UPLOADED
+  PROCESSED
+  FAILED
+}
+
+enum ExtractionStage {
+  NORMALIZED_106
+}
+
+enum FailureStage {
+  EXTRACTION
+  NORMALIZATION
+  VALIDATION
+}
+
+// ─────────────────────────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique // @pii
+  israeliId String?  @unique // @pii
+  firstName String?  // @pii
+  lastName  String?  // @pii
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents       Document[]
+  taxCalculations TaxCalculation[]
+}
+
+model Document {
+  id               String         @id @default(cuid())
+  userId           String
+  type             DocumentType
+  status           DocumentStatus
+  taxYear          Int?
+  originalFileName String?        // @pii
+  storageKey       String
+  uploadedAt       DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  extractions     Extraction[]
+  parsingFailures ParsingFailure[]
+
+  @@index([userId])
+  @@index([userId, taxYear])
+}
+
+model Extraction {
+  id            String          @id @default(cuid())
+  documentId    String
+  parserVersion String
+  stage         ExtractionStage
+  payload       Json
+  checksum      String?
+  createdAt     DateTime        @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@unique([documentId, parserVersion, stage])
+}
+
+model TaxCalculation {
+  id                 String   @id @default(cuid())
+  userId             String
+  taxYear            Int
+  calculationVersion String
+  rulesVersion       String
+  inputSnapshot      Json
+  result             Json
+  createdAt          DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, taxYear])
+  @@index([rulesVersion])
+  @@index([calculationVersion])
+}
+
+model ParsingFailure {
+  id            String       @id @default(cuid())
+  documentId    String
+  parserVersion String
+  stage         FailureStage
+  error         Json
+  createdAt     DateTime     @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([documentId, parserVersion, stage])
+}
