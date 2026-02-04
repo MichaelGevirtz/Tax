@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"],
+      "@tax/adapters": ["../../packages/adapters/src"],
+      "@tax/ingestion": ["../../packages/ingestion/src"]
     }
   },
   "include": [
@@ -28,7 +30,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "src/**/*"
   ],
   "exclude": ["node_modules"]
 }
