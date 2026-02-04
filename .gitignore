@@ -30,3 +30,6 @@ npm-debug.log*
 
 # Test coverage
 coverage/
+
+# Fixtures (may contain sensitive test data)
+fixtures/

@@ -1,9 +1,0 @@
-{
-  "employeeId": "123456782",
-  "employerId": "987654324",
-  "taxYear": 2024,
-  "grossIncome": 150000,
-  "taxDeducted": 25000,
-  "socialSecurityDeducted": 7500,
-  "healthInsuranceDeducted": 4500
-}
