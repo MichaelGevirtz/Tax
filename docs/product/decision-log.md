@@ -17,5 +17,10 @@
 **Reason:** Runtime validation + type inference, prevents silent data corruption.
 
 ## 2026-02-03 – Managed DB Provider
-**Decision:** Neon.  
+**Decision:** Neon.
 **Reason:** DB-only usage, serverless scaling, low operational overhead.
+
+## 2026-02-05 – OCR Strategy for CID-Garbled PDFs
+**Decision:** Tesseract OCR only (no cloud providers for v1).
+**Reason:** Privacy-first approach keeps PII local, zero per-page cost, sufficient for MVP testing. Cloud alternatives (Google Vision, Azure) documented in `/docs/architecture/ocr-strategy.md` for future consideration if Tesseract accuracy proves insufficient.
+**Eliminated:** AWS Textract (no Hebrew support).
