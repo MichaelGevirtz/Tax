@@ -1,5 +1,5 @@
 import { Normalized106Schema, type Normalized106 } from "@tax/domain";
-import type { ExtractedText } from "../extractors/pdf-text";
+import type { ExtractedText, ExtractPdfOptions } from "../extractors/pdf-text";
 import { extractPdfText, extractPdfTextStub } from "../extractors/pdf-text";
 import { normalize106 } from "../normalizers/normalize-106";
 import { IngestionFailure, PARSER_VERSION } from "../errors/ingestion-errors";
@@ -17,14 +17,29 @@ export interface IngestionErrorResult {
 
 export type Ingest106Result = IngestionResult | IngestionErrorResult;
 
+export interface Ingest106Options {
+  password?: string;
+  timeoutMs?: number;
+}
+
 /**
- * Ingest a Form 106 PDF buffer.
+ * Ingest a Form 106 PDF from file path.
  * Stages: extract → normalize → validate
+ *
+ * @param filePath - Absolute path to the PDF file
+ * @param options - Optional extraction options (password, timeout)
  */
-export function ingest106FromPdf(pdfBuffer: Buffer): Ingest106Result {
+export async function ingest106FromPdf(
+  filePath: string,
+  options?: Ingest106Options
+): Promise<Ingest106Result> {
   try {
     // Stage 1: Extract
-    const extracted = extractPdfText(pdfBuffer);
+    const extractOptions: ExtractPdfOptions = {};
+    if (options?.password) extractOptions.password = options.password;
+    if (options?.timeoutMs) extractOptions.timeoutMs = options.timeoutMs;
+
+    const extracted = await extractPdfText(filePath, extractOptions);
 
     // Stage 2: Normalize
     const normalized = normalize106(extracted);

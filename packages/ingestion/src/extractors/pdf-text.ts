@@ -1,22 +1,229 @@
-import { IngestionFailure, PARSER_VERSION } from "../errors/ingestion-errors";
+import { execFile } from "child_process";
+import { promisify } from "util";
+import { access, stat } from "fs/promises";
+import { constants } from "fs";
+import {
+  IngestionFailure,
+  PARSER_VERSION,
+  ExtractionErrorCode,
+} from "../errors/ingestion-errors";
+
+const execFileAsync = promisify(execFile);
+
+export interface ExtractPdfOptions {
+  password?: string;
+  timeoutMs?: number;
+}
 
 export interface ExtractedText {
   raw: string;
 }
 
+const DEFAULT_TIMEOUT_MS = 30000;
+
 /**
- * Stub PDF text extractor.
- * Returns deterministic placeholder text for testing.
- * Replace with real PDF extraction when ready.
+ * Normalize extracted text for deterministic output:
+ * - Normalize line endings to \n
+ * - Trim trailing whitespace from each line
+ * - Trim leading/trailing empty lines
  */
-export function extractPdfText(_pdfBuffer: Buffer): ExtractedText {
-  // Stub implementation - returns fixed text for deterministic testing
-  // In production, this would use a PDF parsing library
-  throw new IngestionFailure({
+function normalizeText(text: string): string {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trim();
+}
+
+/**
+ * Create an IngestionFailure with the given code and message.
+ * IMPORTANT: Never include password in error messages.
+ */
+function createExtractionError(
+  code: ExtractionErrorCode,
+  message: string,
+  cause?: unknown
+): IngestionFailure {
+  return new IngestionFailure({
     stage: "extract",
     parserVersion: PARSER_VERSION,
-    message: "PDF extraction not implemented - use extractPdfTextStub for tests",
+    code,
+    message,
+    cause,
   });
+}
+
+/**
+ * Detect error type from pdftotext stderr/exit code.
+ * Known exit codes:
+ * - 0: success
+ * - 1: error opening PDF (could be password required or invalid)
+ * - 2: error opening output file
+ * - 3: PDF has permissions that disallow copying
+ */
+function detectPdftotextError(
+  stderr: string,
+  exitCode: number | null,
+  hasPassword: boolean
+): ExtractionErrorCode {
+  const stderrLower = stderr.toLowerCase();
+
+  // Check for password-related errors
+  if (
+    stderrLower.includes("incorrect password") ||
+    stderrLower.includes("wrong password")
+  ) {
+    return "PDF_PASSWORD_INVALID";
+  }
+
+  if (
+    stderrLower.includes("password") ||
+    stderrLower.includes("encrypted") ||
+    stderrLower.includes("command line error")
+  ) {
+    // If no password was provided and we get password-related error
+    if (!hasPassword) {
+      return "PDF_PASSWORD_REQUIRED";
+    }
+    // If password was provided but still failing, it's invalid
+    return "PDF_PASSWORD_INVALID";
+  }
+
+  return "PDF_EXTRACTION_FAILED";
+}
+
+/**
+ * Extract text from a PDF file using Poppler's pdftotext.
+ *
+ * Security notes:
+ * - Uses execFile (not exec) to prevent command injection
+ * - Password is passed as argument (visible in process list - known limitation)
+ * - Password is never logged or included in error messages
+ *
+ * @param filePath - Absolute path to the PDF file
+ * @param options - Optional extraction options
+ * @returns Extracted text with deterministic formatting
+ */
+export async function extractPdfText(
+  filePath: string,
+  options?: ExtractPdfOptions
+): Promise<ExtractedText> {
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const password = options?.password;
+
+  // Validate file exists and is accessible
+  try {
+    await access(filePath, constants.R_OK);
+  } catch {
+    throw createExtractionError(
+      "PDF_EXTRACTION_FAILED",
+      `Cannot access file: ${filePath}`
+    );
+  }
+
+  // Validate it's a file (not directory)
+  try {
+    const stats = await stat(filePath);
+    if (!stats.isFile()) {
+      throw createExtractionError(
+        "PDF_EXTRACTION_FAILED",
+        `Path is not a file: ${filePath}`
+      );
+    }
+  } catch (err) {
+    if (err instanceof IngestionFailure) throw err;
+    throw createExtractionError(
+      "PDF_EXTRACTION_FAILED",
+      `Cannot stat file: ${filePath}`,
+      err
+    );
+  }
+
+  // Build pdftotext arguments
+  // -layout: maintain original layout
+  // -: output to stdout
+  const args: string[] = [];
+  if (password) {
+    args.push("-upw", password);
+  }
+  args.push("-layout", filePath, "-");
+
+  try {
+    const { stdout, stderr } = await execFileAsync("pdftotext", args, {
+      timeout: timeoutMs,
+      encoding: "utf8",
+      maxBuffer: 50 * 1024 * 1024, // 50MB max output
+    });
+
+    // Even on success, check stderr for warnings
+    if (stderr && stderr.trim()) {
+      // Some warnings are acceptable, log them if needed
+      // But don't include in production - no logging of potentially sensitive data
+    }
+
+    const normalizedText = normalizeText(stdout);
+
+    // If output is empty, the PDF might be image-only (needs OCR)
+    if (!normalizedText) {
+      throw createExtractionError(
+        "PDF_EXTRACTION_FAILED",
+        "PDF extraction produced empty output - file may be image-only (OCR not supported)"
+      );
+    }
+
+    return { raw: normalizedText };
+  } catch (err: unknown) {
+    // Handle already-wrapped errors
+    if (err instanceof IngestionFailure) {
+      throw err;
+    }
+
+    // Handle execFile errors
+    const execError = err as {
+      code?: string;
+      killed?: boolean;
+      signal?: string;
+      stderr?: string;
+      message?: string;
+    };
+
+    // Check if pdftotext binary is missing
+    if (execError.code === "ENOENT") {
+      throw createExtractionError(
+        "PDF_TOOL_MISSING",
+        "pdftotext binary not found. Install Poppler: https://poppler.freedesktop.org/"
+      );
+    }
+
+    // Check for timeout
+    if (execError.killed && execError.signal === "SIGTERM") {
+      throw createExtractionError(
+        "PDF_EXTRACTION_TIMEOUT",
+        `PDF extraction timed out after ${timeoutMs}ms`
+      );
+    }
+
+    // Parse stderr for specific error types
+    const stderr = execError.stderr || execError.message || "";
+    const errorCode = detectPdftotextError(stderr, null, !!password);
+
+    // Build safe error message (never include password)
+    let safeMessage: string;
+    switch (errorCode) {
+      case "PDF_PASSWORD_REQUIRED":
+        safeMessage = "PDF is password-protected and no password was provided";
+        break;
+      case "PDF_PASSWORD_INVALID":
+        safeMessage = "PDF password is incorrect";
+        break;
+      default:
+        safeMessage = `PDF extraction failed for: ${filePath}`;
+    }
+
+    throw createExtractionError(errorCode, safeMessage);
+  }
 }
 
 /**
