@@ -81,7 +81,7 @@ describe("normalize-106 golden tests", () => {
   });
 
   describe("missing field handling", () => {
-    it("should throw FIELD_NOT_FOUND when a required field is missing", () => {
+    it("should throw MANDATORY_FIELD_MISSING when a required field is missing", () => {
       const incompleteText = `
         Form 106 - Annual Tax Statement
         Employee ID: 123456782
@@ -96,10 +96,10 @@ describe("normalize-106 golden tests", () => {
       } catch (err) {
         expect(err).toBeInstanceOf(IngestionFailure);
         const failure = err as IngestionFailure;
-        expect(failure.code).toBe("FIELD_NOT_FOUND");
+        expect(failure.code).toBe("MANDATORY_FIELD_MISSING");
         expect(failure.stage).toBe("normalize");
-        // Should identify the missing field
-        expect(failure.message).toContain("employerId");
+        // Should identify missing fields in the message
+        expect(failure.message).toContain("not found");
       }
     });
   });

@@ -1,21 +1,14 @@
-import type { Normalized106 } from "@tax/domain";
-import { isValidIsraeliId } from "@tax/domain";
+import type { Extracted106 } from "@tax/domain";
 import type { ExtractedText } from "../extractors/pdf-text";
 import {
   IngestionFailure,
   PARSER_VERSION,
   NormalizationErrorCode,
 } from "../errors/ingestion-errors";
-
-export interface RawForm106Data {
-  employeeId: string;
-  employerId: string;
-  taxYear: number;
-  grossIncome: number;
-  taxDeducted: number;
-  socialSecurityDeducted: number;
-  healthInsuranceDeducted: number;
-}
+import {
+  extractMandatoryFields,
+  tryParseStubFormat,
+} from "../extractors/box-extractor";
 
 /**
  * Create a normalization error without including raw text.
@@ -76,106 +69,14 @@ function isTextGarbled(text: string): boolean {
 }
 
 /**
- * Parse number from text, handling thousands separators.
- * Supports: 1,234.56 or 1234.56 or 1234
- */
-function parseNumber(text: string): number | null {
-  // Remove thousands separators (comma)
-  const cleaned = text.replace(/,/g, "").trim();
-  const num = parseFloat(cleaned);
-  return Number.isFinite(num) && num >= 0 ? num : null;
-}
-
-/**
- * Parse Israeli ID, padding to 9 digits if needed.
- */
-function parseIsraeliId(text: string): string | null {
-  const cleaned = text.replace(/\D/g, "");
-  if (cleaned.length === 0 || cleaned.length > 9) {
-    return null;
-  }
-  const padded = cleaned.padStart(9, "0");
-  return isValidIsraeliId(padded) ? padded : null;
-}
-
-/**
- * Parse year from text.
- */
-function parseYear(text: string): number | null {
-  const match = text.match(/\b(20\d{2})\b/);
-  if (match) {
-    const year = parseInt(match[1], 10);
-    if (year >= 2010 && year <= new Date().getFullYear() + 1) {
-      return year;
-    }
-  }
-  return null;
-}
-
-/**
- * Try to parse using stub format (English labels).
- * Format: "Field Name: value"
- */
-function tryParseStubFormat(text: string): RawForm106Data | null {
-  const employeeIdMatch = text.match(/Employee ID:\s*(\d+)/i);
-  const employerIdMatch = text.match(/Employer ID:\s*(\d+)/i);
-  const taxYearMatch = text.match(/Tax Year:\s*(\d+)/i);
-  const grossIncomeMatch = text.match(/Gross Income:\s*([\d,]+(?:\.\d+)?)/i);
-  const taxDeductedMatch = text.match(/Tax Deducted:\s*([\d,]+(?:\.\d+)?)/i);
-  const socialSecurityMatch = text.match(/Social Security:\s*([\d,]+(?:\.\d+)?)/i);
-  const healthInsuranceMatch = text.match(/Health Insurance:\s*([\d,]+(?:\.\d+)?)/i);
-
-  if (
-    !employeeIdMatch ||
-    !employerIdMatch ||
-    !taxYearMatch ||
-    !grossIncomeMatch ||
-    !taxDeductedMatch ||
-    !socialSecurityMatch ||
-    !healthInsuranceMatch
-  ) {
-    return null;
-  }
-
-  const employeeId = parseIsraeliId(employeeIdMatch[1]);
-  const employerId = parseIsraeliId(employerIdMatch[1]);
-  const taxYear = parseInt(taxYearMatch[1], 10);
-  const grossIncome = parseNumber(grossIncomeMatch[1]);
-  const taxDeducted = parseNumber(taxDeductedMatch[1]);
-  const socialSecurityDeducted = parseNumber(socialSecurityMatch[1]);
-  const healthInsuranceDeducted = parseNumber(healthInsuranceMatch[1]);
-
-  if (
-    employeeId === null ||
-    employerId === null ||
-    grossIncome === null ||
-    taxDeducted === null ||
-    socialSecurityDeducted === null ||
-    healthInsuranceDeducted === null
-  ) {
-    return null;
-  }
-
-  return {
-    employeeId,
-    employerId,
-    taxYear,
-    grossIncome,
-    taxDeducted,
-    socialSecurityDeducted,
-    healthInsuranceDeducted,
-  };
-}
-
-/**
- * Parse extracted text into raw form data.
+ * Parse extracted text into Extracted106 data.
  * Tries multiple parsing strategies in order:
- * 1. Stub format (English labels)
- * 2. (Future) Real Form 106 Hebrew format
+ * 1. Stub format (English labels) - for backward compatibility
+ * 2. Box-anchored extraction (Hebrew/English with positional anchors)
  *
  * Throws if text is garbled or fields cannot be extracted.
  */
-function parseExtractedText(extracted: ExtractedText): RawForm106Data {
+function parseExtractedText(extracted: ExtractedText): Extracted106 {
   const text = extracted.raw;
 
   // Check for garbled text first
@@ -186,57 +87,23 @@ function parseExtractedText(extracted: ExtractedText): RawForm106Data {
     );
   }
 
-  // Try stub format (for tests and English-labeled forms)
+  // Try stub format first (for backward compatibility with tests)
   const stubResult = tryParseStubFormat(text);
   if (stubResult) {
     return stubResult;
   }
 
-  // If we get here, we couldn't parse the text
-  // Determine which field is missing for better error reporting
-  const fields = [
-    { name: "employeeId", pattern: /Employee ID:/i },
-    { name: "employerId", pattern: /Employer ID:/i },
-    { name: "taxYear", pattern: /Tax Year:/i },
-    { name: "grossIncome", pattern: /Gross Income:/i },
-    { name: "taxDeducted", pattern: /Tax Deducted:/i },
-    { name: "socialSecurityDeducted", pattern: /Social Security:/i },
-    { name: "healthInsuranceDeducted", pattern: /Health Insurance:/i },
-  ];
-
-  for (const field of fields) {
-    if (!field.pattern.test(text)) {
-      throw createNormalizationError(
-        "FIELD_NOT_FOUND",
-        `Required field '${field.name}' not found in extracted text`,
-        field.name
-      );
-    }
-  }
-
-  // Fields were found but values are invalid
-  throw createNormalizationError(
-    "FIELD_INVALID",
-    "One or more fields have invalid values"
-  );
+  // Use box-anchored extraction for Hebrew/English forms
+  // This will throw MANDATORY_FIELD_MISSING or FIELD_AMBIGUOUS if needed
+  return extractMandatoryFields(text);
 }
 
 /**
- * Normalize extracted text into a Normalized106 object.
+ * Normalize extracted text into an Extracted106 object.
  * This is deterministic: same input always produces same output.
  *
  * @throws {IngestionFailure} If normalization fails
  */
-export function normalize106(extracted: ExtractedText): Normalized106 {
-  const raw = parseExtractedText(extracted);
-
-  return {
-    employeeId: raw.employeeId,
-    employerId: raw.employerId,
-    taxYear: raw.taxYear,
-    grossIncome: raw.grossIncome,
-    taxDeducted: raw.taxDeducted,
-    socialSecurityDeducted: raw.socialSecurityDeducted,
-    healthInsuranceDeducted: raw.healthInsuranceDeducted,
-  };
+export function normalize106(extracted: ExtractedText): Extracted106 {
+  return parseExtractedText(extracted);
 }

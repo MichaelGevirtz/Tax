@@ -1,5 +1,6 @@
 // Schemas
 export { Normalized106Schema } from "./schemas/normalized-106.schema";
+export { Extracted106Schema } from "./schemas/extracted-106.schema";
 export { TaxInputSchema } from "./schemas/tax-input.schema";
 export { TaxResultSchema } from "./schemas/tax-result.schema";
 export {
@@ -12,6 +13,7 @@ export {
 // Types
 export type {
   Normalized106,
+  Extracted106,
   TaxInput,
   TaxResult,
   CalculationRequest,

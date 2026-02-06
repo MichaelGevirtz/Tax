@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Normalized106Schema } from "../schemas/normalized-106.schema";
+import { Extracted106Schema } from "../schemas/extracted-106.schema";
 import { TaxInputSchema } from "../schemas/tax-input.schema";
 import { TaxResultSchema } from "../schemas/tax-result.schema";
 import {
@@ -10,6 +11,7 @@ import {
 } from "../schemas/api-contracts.schema";
 
 export type Normalized106 = z.infer<typeof Normalized106Schema>;
+export type Extracted106 = z.infer<typeof Extracted106Schema>;
 export type TaxInput = z.infer<typeof TaxInputSchema>;
 export type TaxResult = z.infer<typeof TaxResultSchema>;
 export type CalculationRequest = z.infer<typeof CalculationRequestSchema>;

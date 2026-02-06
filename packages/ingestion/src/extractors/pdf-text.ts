@@ -19,6 +19,37 @@ export interface ExtractedText {
   raw: string;
 }
 
+/** Default threshold in characters for image-only detection */
+export const IMAGE_ONLY_THRESHOLD = 50;
+
+/** Minimum meaningful characters (non-whitespace/control) for text detection */
+const MEANINGFUL_CHARS_THRESHOLD = 20;
+
+/**
+ * Check if a PDF appears to be image-only (scanned) based on extraction output.
+ * Uses heuristics based on extraction output length.
+ *
+ * @param extracted - The extracted text result
+ * @param threshold - Character threshold (default: 50)
+ * @returns true if PDF appears to be image-only (scanned)
+ */
+export function isImageOnlyPdf(extracted: ExtractedText, threshold: number = IMAGE_ONLY_THRESHOLD): boolean {
+  const text = extracted.raw.trim();
+
+  // If very short output, likely image-only
+  if (text.length < threshold) {
+    return true;
+  }
+
+  // If only whitespace/control characters, likely image-only
+  const meaningfulChars = text.replace(/[\s\x00-\x1f]/g, "");
+  if (meaningfulChars.length < MEANINGFUL_CHARS_THRESHOLD) {
+    return true;
+  }
+
+  return false;
+}
+
 const DEFAULT_TIMEOUT_MS = 30000;
 
 /**
@@ -165,14 +196,8 @@ export async function extractPdfText(
 
     const normalizedText = normalizeText(stdout);
 
-    // If output is empty, the PDF might be image-only (needs OCR)
-    if (!normalizedText) {
-      throw createExtractionError(
-        "PDF_EXTRACTION_FAILED",
-        "PDF extraction produced empty output - file may be image-only (OCR not supported)"
-      );
-    }
-
+    // Return result even if empty - let caller check isImageOnlyPdf()
+    // and route to OCR if needed
     return { raw: normalizedText };
   } catch (err: unknown) {
     // Handle already-wrapped errors
@@ -238,9 +263,12 @@ export function extractPdfTextStub(): ExtractedText {
       Employer ID: 987654324
       Tax Year: 2024
       Gross Income: 150000
+      Taxable Income: 140000
       Tax Deducted: 25000
       Social Security: 7500
       Health Insurance: 4500
+      Pension Contribution: 6000
+      Education Fund: 3000
     `,
   };
 }
