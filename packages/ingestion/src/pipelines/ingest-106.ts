@@ -3,6 +3,7 @@ import type { ExtractedText, ExtractPdfOptions } from "../extractors/pdf-text";
 import { extractPdfText, extractPdfTextStub, isImageOnlyPdf } from "../extractors/pdf-text";
 import { extractPdfViaOcr, isTesseractAvailable, type OcrOptions, type OcrQualityGateOptions } from "../extractors/ocr-text";
 import { normalize106 } from "../normalizers/normalize-106";
+import { validatePdfSecurity } from "../validators/pdf-validator";
 import { IngestionFailure, PARSER_VERSION } from "../errors/ingestion-errors";
 
 export type ExtractionMethod = "pdftotext" | "ocr_tesseract";
@@ -49,6 +50,9 @@ export async function ingest106FromPdf(
   const enableOcrFallback = options?.enableOcrFallback ?? false;
 
   try {
+    // Stage 0: Security validation (before any tool touches the file)
+    await validatePdfSecurity(filePath);
+
     // Stage 1: Extract via pdftotext
     const extractOptions: ExtractPdfOptions = {};
     if (options?.password) extractOptions.password = options.password;

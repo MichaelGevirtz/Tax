@@ -1,5 +1,10 @@
 export type IngestionStage = "extract" | "normalize" | "validate";
 
+export type SecurityErrorCode =
+  | "PDF_INVALID_FORMAT"    // File is not a valid PDF (magic bytes mismatch)
+  | "PDF_SECURITY_RISK"     // Contains dangerous objects (JS, Launch, etc.)
+  | "PDF_TOO_LARGE";        // Exceeds maximum file size
+
 export type ExtractionErrorCode =
   | "PDF_TOOL_MISSING"
   | "PDF_PASSWORD_REQUIRED"
@@ -23,7 +28,7 @@ export type NormalizationErrorCode =
   | "FIELD_AMBIGUOUS"          // Multiple candidates for same field
   | "MANDATORY_FIELD_MISSING"; // Required field not found
 
-export type IngestionErrorCode = ExtractionErrorCode | NormalizationErrorCode | OcrErrorCode;
+export type IngestionErrorCode = SecurityErrorCode | ExtractionErrorCode | NormalizationErrorCode | OcrErrorCode;
 
 export interface IngestionError {
   stage: IngestionStage;
