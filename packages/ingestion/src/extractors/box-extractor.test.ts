@@ -189,12 +189,9 @@ describe("box-extractor", () => {
         Employer ID: 516179157
         Tax Year: 2024
         Gross Income: 150,000
-        Taxable Income: 140,000
         Tax Deducted: 25,000
         Social Security: 8,500
         Health Insurance: 4,200
-        Pension Contribution: 6,000
-        Education Fund: 3,000
       `;
       const result = tryParseStubFormat(text);
       expect(result).not.toBeNull();
@@ -202,43 +199,9 @@ describe("box-extractor", () => {
       expect(result!.employerId).toBe("516179157");
       expect(result!.taxYear).toBe(2024);
       expect(result!.grossIncome).toBe(150000);
-      expect(result!.taxableIncome).toBe(140000);
       expect(result!.taxDeducted).toBe(25000);
       expect(result!.socialSecurityDeducted).toBe(8500);
       expect(result!.healthInsuranceDeducted).toBe(4200);
-      expect(result!.pensionContribEmployee).toBe(6000);
-      expect(result!.educationFundEmployee).toBe(3000);
-    });
-
-    it("defaults taxableIncome to grossIncome if missing", () => {
-      const text = `
-        Employee ID: 123456782
-        Employer ID: 516179157
-        Tax Year: 2024
-        Gross Income: 150,000
-        Tax Deducted: 25,000
-        Social Security: 8,500
-        Health Insurance: 4,200
-      `;
-      const result = tryParseStubFormat(text);
-      expect(result).not.toBeNull();
-      expect(result!.taxableIncome).toBe(150000);
-    });
-
-    it("defaults optional fields to 0 if missing", () => {
-      const text = `
-        Employee ID: 123456782
-        Employer ID: 516179157
-        Tax Year: 2024
-        Gross Income: 150,000
-        Tax Deducted: 25,000
-        Social Security: 8,500
-        Health Insurance: 4,200
-      `;
-      const result = tryParseStubFormat(text);
-      expect(result).not.toBeNull();
-      expect(result!.pensionContribEmployee).toBe(0);
-      expect(result!.educationFundEmployee).toBe(0);
     });
 
     it("returns null for incomplete stub format", () => {
@@ -295,24 +258,18 @@ describe("box-extractor", () => {
         מספר מזהה מעסיק: 516179157
         שנת מס: 2024
         סה"כ הכנסה ממשכורת: 150,000
-        הכנסה חייבת במס: 140,000
         מס שנוכה: 25,000
         ביטוח לאומי: 8,500
         ביטוח בריאות: 4,200
-        הפרשות עובד לפנסיה: 6,000
-        קרן השתלמות עובד: 3,000
       `;
       const result = extractMandatoryFields(text);
       expect(result.employeeId).toBe("123456782");
       expect(result.employerId).toBe("516179157");
       expect(result.taxYear).toBe(2024);
       expect(result.grossIncome).toBe(150000);
-      expect(result.taxableIncome).toBe(140000);
       expect(result.taxDeducted).toBe(25000);
       expect(result.socialSecurityDeducted).toBe(8500);
       expect(result.healthInsuranceDeducted).toBe(4200);
-      expect(result.pensionContribEmployee).toBe(6000);
-      expect(result.educationFundEmployee).toBe(3000);
     });
 
     it("extracts all fields from complete English form text", () => {
@@ -321,12 +278,9 @@ describe("box-extractor", () => {
         Employer ID: 516179157
         Tax Year: 2024
         Gross Income: 150,000
-        Taxable Income: 140,000
         Tax Deducted: 25,000
         Social Security: 8,500
         Health Insurance: 4,200
-        Pension Contribution: 6,000
-        Education Fund: 3,000
       `;
       const result = extractMandatoryFields(text);
       expect(result.employeeId).toBe("123456782");

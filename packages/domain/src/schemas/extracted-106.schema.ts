@@ -25,18 +25,13 @@ export const Extracted106Schema = z.object({
   employerId: IsraeliIdSchema,         // Box 2: מספר מזהה מעסיק
   taxYear: TaxYearSchema,              // שנת מס
 
-  // Income (boxes 42-49 area)
-  grossIncome: MoneySchema,            // Box 42: סה"כ הכנסה ממשכורת
-  taxableIncome: MoneySchema,          // Box 45: הכנסה חייבת במס
+  // Income
+  grossIncome: MoneySchema,            // סה"כ תשלומים
 
-  // Deductions (boxes 36-41 area)
-  taxDeducted: MoneySchema,            // Box 36: מס שנוכה
-  socialSecurityDeducted: MoneySchema, // Box 38: ביטוח לאומי
-  healthInsuranceDeducted: MoneySchema,// Box 39: ביטוח בריאות
-
-  // Additional mandatory fields for Form 135
-  pensionContribEmployee: MoneySchema, // Box 37: הפרשות עובד לפנסיה
-  educationFundEmployee: MoneySchema,  // Box 40: קרן השתלמות עובד
+  // Deductions
+  taxDeducted: MoneySchema,            // מס הכנסה [042]
+  socialSecurityDeducted: MoneySchema, // ביטוח לאומי
+  healthInsuranceDeducted: MoneySchema,// דמי בריאות
 });
 
 export type Extracted106 = z.infer<typeof Extracted106Schema>;

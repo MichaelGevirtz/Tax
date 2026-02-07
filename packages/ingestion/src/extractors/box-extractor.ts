@@ -16,12 +16,9 @@ export const FIELD_ANCHORS = {
   employerId: /מספר\s*מזהה\s*מעסיק|ח\.פ\.|Employer ID/i,
   taxYear: /שנת\s*מס|Tax Year/i,
   grossIncome: /סה"כ\s*הכנסה\s*ממשכורת|משבצת\s*42|Gross Income/i,
-  taxableIncome: /הכנסה\s*חייבת\s*במס|משבצת\s*45|Taxable Income/i,
   taxDeducted: /מס\s*שנוכה|משבצת\s*36|Tax Deducted/i,
   socialSecurityDeducted: /ביטוח\s*לאומי|משבצת\s*38|Social Security/i,
   healthInsuranceDeducted: /ביטוח\s*בריאות|משבצת\s*39|Health Insurance/i,
-  pensionContribEmployee: /הפרשות\s*עובד\s*לפנסיה|משבצת\s*37|Pension Contribution/i,
-  educationFundEmployee: /קרן\s*השתלמות\s*עובד|משבצת\s*40|Education Fund/i,
 } as const;
 
 export type FieldName = keyof typeof FIELD_ANCHORS;
@@ -32,12 +29,9 @@ export const MANDATORY_FIELDS: FieldName[] = [
   "employerId",
   "taxYear",
   "grossIncome",
-  "taxableIncome",
   "taxDeducted",
   "socialSecurityDeducted",
   "healthInsuranceDeducted",
-  "pensionContribEmployee",
-  "educationFundEmployee",
 ];
 
 /** Result of extracting a single field */
@@ -390,14 +384,10 @@ export function tryParseStubFormat(text: string): Extracted106 | null {
   const employerIdMatch = text.match(/Employer ID:\s*(\d+)/i);
   const taxYearMatch = text.match(/Tax Year:\s*(\d+)/i);
   const grossIncomeMatch = text.match(/Gross Income:\s*([\d,]+(?:\.\d+)?)/i);
-  const taxableIncomeMatch = text.match(/Taxable Income:\s*([\d,]+(?:\.\d+)?)/i);
   const taxDeductedMatch = text.match(/Tax Deducted:\s*([\d,]+(?:\.\d+)?)/i);
   const socialSecurityMatch = text.match(/Social Security:\s*([\d,]+(?:\.\d+)?)/i);
   const healthInsuranceMatch = text.match(/Health Insurance:\s*([\d,]+(?:\.\d+)?)/i);
-  const pensionContribMatch = text.match(/Pension Contribution:\s*([\d,]+(?:\.\d+)?)/i);
-  const educationFundMatch = text.match(/Education Fund:\s*([\d,]+(?:\.\d+)?)/i);
 
-  // Check required fields (backward compatible - some may be optional)
   if (
     !employeeIdMatch ||
     !employerIdMatch ||
@@ -414,23 +404,17 @@ export function tryParseStubFormat(text: string): Extracted106 | null {
   const employerId = parseIsraeliId(employerIdMatch[1]);
   const taxYear = parseInt(taxYearMatch[1], 10);
   const grossIncome = parseNumber(grossIncomeMatch[1]);
-  const taxableIncome = taxableIncomeMatch ? parseNumber(taxableIncomeMatch[1]) : grossIncome; // default to grossIncome
   const taxDeducted = parseNumber(taxDeductedMatch[1]);
   const socialSecurityDeducted = parseNumber(socialSecurityMatch[1]);
   const healthInsuranceDeducted = parseNumber(healthInsuranceMatch[1]);
-  const pensionContribEmployee = pensionContribMatch ? parseNumber(pensionContribMatch[1]) : 0;
-  const educationFundEmployee = educationFundMatch ? parseNumber(educationFundMatch[1]) : 0;
 
   if (
     employeeId === null ||
     employerId === null ||
     grossIncome === null ||
-    taxableIncome === null ||
     taxDeducted === null ||
     socialSecurityDeducted === null ||
-    healthInsuranceDeducted === null ||
-    pensionContribEmployee === null ||
-    educationFundEmployee === null
+    healthInsuranceDeducted === null
   ) {
     return null;
   }
@@ -440,11 +424,8 @@ export function tryParseStubFormat(text: string): Extracted106 | null {
     employerId,
     taxYear,
     grossIncome,
-    taxableIncome,
     taxDeducted,
     socialSecurityDeducted,
     healthInsuranceDeducted,
-    pensionContribEmployee,
-    educationFundEmployee,
   };
 }

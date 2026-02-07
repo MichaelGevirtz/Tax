@@ -263,12 +263,9 @@ export function extractPdfTextStub(): ExtractedText {
       Employer ID: 987654324
       Tax Year: 2024
       Gross Income: 150000
-      Taxable Income: 140000
       Tax Deducted: 25000
       Social Security: 7500
       Health Insurance: 4500
-      Pension Contribution: 6000
-      Education Fund: 3000
     `,
   };
 }
