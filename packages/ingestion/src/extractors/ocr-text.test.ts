@@ -86,7 +86,7 @@ describe("ocr-text", () => {
           }
           throw err;
         }
-      });
+      }, 30000);
 
       it("should produce deterministic output across multiple OCR runs", async () => {
         const tesseractAvailable = await isTesseractAvailable();
@@ -160,7 +160,7 @@ describe("ocr-text", () => {
             );
           }
         }
-      });
+      }, 30000);
 
       it("should use specified languages", async () => {
         const tesseractAvailable = await isTesseractAvailable();
@@ -190,7 +190,7 @@ describe("ocr-text", () => {
           }
           throw err;
         }
-      });
+      }, 30000);
 
       it("should throw OCR_LANGUAGE_MISSING if Hebrew data not installed", async () => {
         const tesseractAvailable = await isTesseractAvailable();
@@ -367,7 +367,7 @@ describe("ocr-text", () => {
         }
         throw err;
       }
-    });
+    }, 30000);
 
     it("should throw OCR_QUALITY_CRITICAL for very low confidence", async () => {
       const tesseractAvailable = await isTesseractAvailable();
@@ -401,7 +401,7 @@ describe("ocr-text", () => {
         expect(failure.message).toContain("OCR quality too low");
         expect(failure.message).toContain("higher resolution");
       }
-    });
+    }, 30000);
 
     it("should add warning for marginal confidence", async () => {
       const tesseractAvailable = await isTesseractAvailable();
@@ -438,7 +438,7 @@ describe("ocr-text", () => {
         }
         throw err;
       }
-    });
+    }, 30000);
 
     it("should skip quality gate when disabled", async () => {
       const tesseractAvailable = await isTesseractAvailable();
@@ -471,7 +471,7 @@ describe("ocr-text", () => {
         }
         throw err;
       }
-    });
+    }, 30000);
   });
 
   describe("OCR_QUALITY_THRESHOLDS", () => {

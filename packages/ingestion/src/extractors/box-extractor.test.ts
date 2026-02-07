@@ -126,6 +126,16 @@ describe("box-extractor", () => {
       expect(FIELD_ANCHORS.taxYear.test("שנת מס")).toBe(true);
     });
 
+    it("matches OCR Hebrew patterns", () => {
+      // OCR from real Form 106 uses different wording than idealized labels
+      expect(FIELD_ANCHORS.employeeId.test("מספר זהות סוג משרה")).toBe(true);
+      expect(FIELD_ANCHORS.employerId.test("שם מעסיק כתובת")).toBe(true);
+      expect(FIELD_ANCHORS.employerId.test("תיק ניכויים")).toBe(true);
+      expect(FIELD_ANCHORS.grossIncome.test("משכורת : 622,809")).toBe(true);
+      expect(FIELD_ANCHORS.taxDeducted.test("מס הכנסה : 167,596")).toBe(true);
+      expect(FIELD_ANCHORS.healthInsuranceDeducted.test("דמי בריאות : 27,708")).toBe(true);
+    });
+
     it("matches English patterns for backward compatibility", () => {
       expect(FIELD_ANCHORS.grossIncome.test("Gross Income")).toBe(true);
       expect(FIELD_ANCHORS.employeeId.test("Employee ID")).toBe(true);
@@ -165,6 +175,27 @@ describe("box-extractor", () => {
       const result = extractFieldByAnchor(text, "grossIncome");
       expect(result).not.toBeNull();
       expect(result!.value).toBe(120000);
+    });
+
+    it("extracts grossIncome from OCR 'משכורת :' pattern", () => {
+      const text = "]158 ,172[ = משכורת : 622,809 [272,258]";
+      const result = extractFieldByAnchor(text, "grossIncome");
+      expect(result).not.toBeNull();
+      expect(result!.value).toBe(622809);
+    });
+
+    it("extracts taxDeducted from OCR 'מס הכנסה :' pattern", () => {
+      const text = "]042 [ מס הכנסה : 167,596";
+      const result = extractFieldByAnchor(text, "taxDeducted");
+      expect(result).not.toBeNull();
+      expect(result!.value).toBe(167596);
+    });
+
+    it("extracts healthInsurance from OCR 'דמי בריאות' pattern", () => {
+      const text = "דמי בריאות : 27,708";
+      const result = extractFieldByAnchor(text, "healthInsuranceDeducted");
+      expect(result).not.toBeNull();
+      expect(result!.value).toBe(27708);
     });
   });
 
@@ -286,6 +317,30 @@ describe("box-extractor", () => {
       expect(result.employeeId).toBe("123456782");
       expect(result.taxYear).toBe(2024);
       expect(result.grossIncome).toBe(150000);
+    });
+
+    it("extracts all fields from OCR-style Form 106 text", () => {
+      // Realistic OCR text snippet from real Form 106 (table layout:
+      // values on one line, labels on the next)
+      const text = [
+        "רוזטל מערכות ידע בעמ עמינדב 21 תל אביב 921513545",
+        "שם מעסיק כתובת מעסיק תיק ניכויים משרד שומה",
+        "משה מיכאל 10 פתח תקוה 031394828",
+        "שם העובד כתובת העובד מספר זהות סוג משרה",
+        "לשנת מס 2024 (טופס 106)",
+        "משכורת : 622,809",
+        "מס הכנסה : 167,596",
+        "ביטוח לאומי : 25,220",
+        "דמי בריאות : 27,708",
+      ].join("\n");
+      const result = extractMandatoryFields(text);
+      expect(result.employerId).toBe("921513545");
+      expect(result.employeeId).toBe("031394828");
+      expect(result.taxYear).toBe(2024);
+      expect(result.grossIncome).toBe(622809);
+      expect(result.taxDeducted).toBe(167596);
+      expect(result.socialSecurityDeducted).toBe(25220);
+      expect(result.healthInsuranceDeducted).toBe(27708);
     });
   });
 });

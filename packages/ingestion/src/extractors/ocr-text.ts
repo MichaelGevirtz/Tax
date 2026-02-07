@@ -70,7 +70,7 @@ const QUALITY_MESSAGES = {
 };
 
 const DEFAULT_TIMEOUT_MS = 60000;
-const DEFAULT_DPI = 300;
+const DEFAULT_DPI = 600;
 const DEFAULT_LANGUAGES = ["heb", "eng"];
 
 // Common Tesseract installation paths on Windows

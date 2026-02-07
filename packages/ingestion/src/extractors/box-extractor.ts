@@ -12,13 +12,13 @@ import {
  * Supports both Hebrew labels and box numbers (e.g., "משבצת 42").
  */
 export const FIELD_ANCHORS = {
-  employeeId: /מספר\s*זהות\s*עובד|ת\.ז\.\s*עובד|Employee ID/i,
-  employerId: /מספר\s*מזהה\s*מעסיק|ח\.פ\.|Employer ID/i,
+  employeeId: /מספר\s*זהות\s*עובד|מספר\s*זהות|ת\.ז\.\s*עובד|Employee ID/i,
+  employerId: /מספר\s*מזהה\s*מעסיק|שם\s*מעסיק|תיק\s*ניכויים|ח\.פ\.|Employer ID/i,
   taxYear: /שנת\s*מס|Tax Year/i,
-  grossIncome: /סה"כ\s*הכנסה\s*ממשכורת|משבצת\s*42|Gross Income/i,
-  taxDeducted: /מס\s*שנוכה|משבצת\s*36|Tax Deducted/i,
+  grossIncome: /סה"כ\s*הכנסה\s*ממשכורת|משכורת\s*:|משבצת\s*42|Gross Income/i,
+  taxDeducted: /מס\s*שנוכה|מס\s*הכנסה\s*:|משבצת\s*36|Tax Deducted/i,
   socialSecurityDeducted: /ביטוח\s*לאומי|משבצת\s*38|Social Security/i,
-  healthInsuranceDeducted: /ביטוח\s*בריאות|משבצת\s*39|Health Insurance/i,
+  healthInsuranceDeducted: /ביטוח\s*בריאות|דמי\s*בריאות|משבצת\s*39|Health Insurance/i,
 } as const;
 
 export type FieldName = keyof typeof FIELD_ANCHORS;
@@ -122,8 +122,10 @@ export function findNumericPatterns(text: string): Array<{ value: string; positi
  */
 export function findIdPatterns(text: string): Array<{ value: string; position: number }> {
   const results: Array<{ value: string; position: number }> = [];
-  // Match 9-digit numbers or numbers that could be IDs (1-9 digits)
-  const idRegex = /\b\d{1,9}\b/g;
+  // Match 7-9 digit numbers that could be Israeli IDs.
+  // Shorter numbers (e.g., 3-digit fragments from comma-separated amounts
+  // like "596" from "167,596") produce false positives with checksum validation.
+  const idRegex = /\b\d{7,9}\b/g;
 
   let match;
   while ((match = idRegex.exec(text)) !== null) {
@@ -198,10 +200,13 @@ export function extractFieldByAnchor(
       return null;
     }
 
-    // Find the closest valid ID to the anchor
+    // Find the closest valid ID to the anchor.
+    // Use tight maxDistance (80) for IDs: in Form 106 table layout,
+    // values are on one line and labels on the next. A wider distance
+    // would pick up IDs from adjacent table rows (e.g., employer vs employee).
     let bestMatch: { value: string; position: number; score: number } | null = null;
     for (const pattern of idPatterns) {
-      const score = calculateProximityScore(anchorPos, anchorLen, pattern.position);
+      const score = calculateProximityScore(anchorPos, anchorLen, pattern.position, 80);
       if (score > 0 && (!bestMatch || score > bestMatch.score)) {
         bestMatch = { ...pattern, score };
       }
@@ -313,17 +318,19 @@ export function checkAmbiguity(
   const anchorPos = anchorMatch.index;
   const anchorLen = anchorMatch[0].length;
 
-  // Get all candidates
-  const patterns = fieldName === "employeeId" || fieldName === "employerId"
+  // Get all candidates — use same maxDistance as extraction
+  const isIdField = fieldName === "employeeId" || fieldName === "employerId";
+  const patterns = isIdField
     ? findIdPatterns(text)
     : findNumericPatterns(text);
+  const maxDistance = isIdField ? 80 : 200;
 
   // Count candidates with confidence close to primary (within 20%)
   const threshold = primaryResult.confidence * 0.8;
   let closeMatches = 0;
 
   for (const pattern of patterns) {
-    const score = calculateProximityScore(anchorPos, anchorLen, pattern.position);
+    const score = calculateProximityScore(anchorPos, anchorLen, pattern.position, maxDistance);
     if (score >= threshold && pattern.position !== primaryResult.position) {
       closeMatches++;
     }

@@ -52,7 +52,7 @@ describe("ocr-106 golden tests", () => {
         console.log(`Created OCR expected file: ${SAMPLE_OCR_EXPECTED}`);
         expect(result.text).toBeTruthy();
       }
-    });
+    }, 30000);
 
     it("should produce deterministic OCR output", async () => {
       if (!tesseractAvailable) {
@@ -119,7 +119,7 @@ describe("ocr-106 golden tests", () => {
         console.log("OCR extraction failed:", resultWithOcr.error.code);
         // This is acceptable - the OCR path was attempted
       }
-    });
+    }, 60000);
 
     it("should report OCR_TOOL_MISSING when Tesseract not installed and OCR fallback needed", async () => {
       // This test is for when Tesseract is NOT available
@@ -202,6 +202,6 @@ describe("ocr-106 golden tests", () => {
       // Check temp directory after extraction - should not have new ocr- directories
       const afterFiles = fs.readdirSync(tempDir).filter((f) => f.startsWith("ocr-"));
       expect(afterFiles.length).toBeLessThanOrEqual(beforeFiles.length);
-    });
+    }, 30000);
   });
 });
