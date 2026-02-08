@@ -1,6 +1,7 @@
 // Schemas
 export { Normalized106Schema } from "./schemas/normalized-106.schema";
 export { Extracted106Schema } from "./schemas/extracted-106.schema";
+export { Form135Schema, Form135GenerationMetaSchema } from "./schemas/form-135.schema";
 export { TaxInputSchema } from "./schemas/tax-input.schema";
 export { TaxResultSchema } from "./schemas/tax-result.schema";
 export {
@@ -20,6 +21,8 @@ export type {
   CalculationResponse,
   IngestionRequest,
   IngestionResponse,
+  Form135Data,
+  Form135GenerationMeta,
 } from "./types";
 
 // Validators

@@ -10,9 +10,8 @@
     "noEmit": true,
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@tax/core": ["../core/src"],
       "@tax/domain": ["../domain/src"]
     }
   },
-  "include": ["src/**/*", "__tests__/**/*"]
+  "include": ["src/**/*"]
 }

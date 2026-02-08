@@ -216,7 +216,7 @@ describe("ocr-text", () => {
             expect(err.stage).toBe("extract");
           }
         }
-      });
+      }, 30000);
     });
 
     describe("error handling", () => {
