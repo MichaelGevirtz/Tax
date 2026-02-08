@@ -1,6 +1,3 @@
-# Tax Refund SaaS
-
-Israeli Form 135 tax refund filing — self-serve document generation platform.
 
 Built with Next.js, TypeScript, Prisma, Zod, and pdf-lib. Hebrew-first, RTL-native.
 
@@ -75,7 +72,6 @@ When AI generates code at speed, the failure mode is not "too slow" — it is **
 Every TASK follows a [standard template](docs/tasks/_TASK_TEMPLATE.md) with four sections matching the loop stages:
 
 ```
-TASK-016 – Generate Form 135 PDF from Form 106 Data
 
 ## PLAN
   Goal, Inputs, Outputs, Constraints, Open Questions
