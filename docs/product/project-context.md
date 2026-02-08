@@ -47,13 +47,25 @@ Primary: one-time payment per filing (fixed price).
 
 Why this works: clear value exchange, no incentive misalignment, no dependency on refund outcome, simple accounting.
 
+### Secondary (future): Partner-operated service tier
+
+- Commission-based pricing (terms TBD with partner)
+- Operated entirely by an external partner — not in-house
+- No power of attorney granted by us
+- No in-house human handling, phone support, or case management
+- Positioned as "Coming soon" until partner confirmed
+- Revenue: share arrangement with partner
+- Purpose: capture users who prefer human assistance, without building service operations
+
+See `decision-log.md` (2026-02-08) for full constraints.
+
 ## Explicit Exclusions
 
 Intentional exclusions to protect margins and sanity:
 
-- No "we submit for you"
-- No phone support
-- No success-based fees
+- No "we submit for you" (self-serve product; partner service tier is separate)
+- No phone support (in-house)
+- No success-based fees (in-house; partner tier may use commission model)
 - No employer or B2B flows
 - No paid traffic arbitrage
 - No complex subscriptions early on
@@ -94,7 +106,7 @@ Not competing head-on — serving a different psychological segment.
 
 - No guaranteed external APIs
 - User supplies documents manually
-- Product must not become a service business
+- Product must not become a service business (partner service tier is externally operated, not in-house)
 
 ## Success Criteria
 
