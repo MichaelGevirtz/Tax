@@ -1,0 +1,78 @@
+.hero {
+  background: var(--color-bg-white);
+  padding: 80px var(--mobile-padding) 72px;
+  text-align: center;
+}
+
+.inner {
+  max-width: var(--max-content-width);
+  margin-inline: auto;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: var(--space-lg);
+  color: var(--color-text);
+}
+
+.subtitle {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+  max-width: 520px;
+  margin-inline: auto;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.primaryBtn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 24px 56px;
+  border-radius: 14px;
+  font-size: 22px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 200ms ease-out, box-shadow 200ms ease-out;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.primaryBtn:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.microCopy {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-md);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.microCopy span::before {
+  content: "\2713  ";
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  .hero {
+    padding-inline: var(--tablet-padding);
+  }
+
+  .title {
+    font-size: 38px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    padding-inline: var(--desktop-padding);
+  }
+}

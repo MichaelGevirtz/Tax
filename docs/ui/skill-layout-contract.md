@@ -76,17 +76,20 @@ Rules:
 
 ## Responsive Breakpoints
 
-| Breakpoint | Name | Min Width |
-|------------|------|-----------|
-| `sm` | Mobile | 0px (default) |
-| `md` | Tablet | 640px |
-| `lg` | Desktop | 1024px |
+| Breakpoint | Name | Min Width | Target |
+|------------|------|-----------|--------|
+| `sm` | Mobile | 0px (default) | Phones (320px–639px) |
+| `md` | Tablet | 640px | iPad, tablets (640px–1023px) |
+| `lg` | Desktop | 1024px | Laptops (1024px–1439px) |
+| `xl` | Ultra-wide | 1440px | Large monitors, ultra-wide |
 
 Rules:
 
 - Mobile-first: base styles target mobile, larger breakpoints override
 - App flow pages are single-column at all breakpoints
 - Content pages may use 2-column layout at `lg` and above
+- Ultra-wide (`xl`): content max-width capped via `max-content-width` / `max-page-width` — no stretching
+- All screens must be tested at: 375px (mobile), 768px (tablet), 1280px (laptop), 1920px (ultra-wide)
 
 ---
 

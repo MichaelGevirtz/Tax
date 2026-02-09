@@ -1,0 +1,25 @@
+.section {
+  padding-block: var(--space-3xl);
+  padding-inline: var(--mobile-padding);
+}
+
+.section.alt {
+  background: var(--color-bg-alt);
+}
+
+.inner {
+  margin-inline: auto;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .section {
+    padding-inline: var(--tablet-padding);
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding-inline: var(--desktop-padding);
+  }
+}

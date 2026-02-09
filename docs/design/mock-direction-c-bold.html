@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction C: Bold Confident</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FFFFFF;
+    --bg-alt: #F1F5F9;
+    --text: #0F172A;
+    --text-secondary: #475569;
+    --primary: #4338CA;
+    --primary-hover: #3730A3;
+    --primary-light: #EEF2FF;
+    --border: #CBD5E1;
+    --surface: #FFFFFF;
+    --radius: 8px;
+    --font: 'Noto Sans Hebrew', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    background: var(--text);
+    padding: 14px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .header-link {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 200ms;
+  }
+  .header-link:hover { color: white; }
+
+  /* Hero */
+  .hero {
+    background: var(--bg-alt);
+    padding: 80px 32px 72px;
+    text-align: center;
+  }
+  .hero-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .hero p {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+  .cta-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 16px 36px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: background 200ms ease-out;
+  }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 16px 36px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 400;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 200ms ease-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* Trust Signals */
+  .trust {
+    padding: 48px 32px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .trust-row {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .trust-badge {
+    padding: 16px 28px;
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    border-left: 1px solid var(--border);
+  }
+  .trust-badge:last-child { border-left: none; }
+  .trust-icon {
+    color: var(--primary);
+    font-size: 18px;
+  }
+
+  /* How it works */
+  .how-section {
+    background: var(--bg-alt);
+    padding: 72px 32px;
+  }
+  .how-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .how-inner h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .how-sub {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin-bottom: 48px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .step {
+    text-align: center;
+    padding: 28px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .step h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .step p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* FAQ */
+  .faq-section {
+    background: var(--bg);
+    padding: 72px 32px;
+    border-top: 1px solid var(--border);
+  }
+  .faq-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .faq-inner h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  .faq-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .faq-q {
+    padding: 18px 22px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg);
+  }
+  .faq-q::after { content: "+"; color: var(--primary); font-weight: 600; font-size: 20px; }
+  .faq-a {
+    padding: 0 22px 18px;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  .footer {
+    background: var(--text);
+    padding: 32px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+  .footer a { color: rgba(255,255,255,0.6); margin: 0 12px; text-decoration: none; }
+  .footer a:hover { color: white; }
+
+  /* Label */
+  .mock-label {
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+  <div class="mock-label">DIRECTION C: BOLD CONFIDENT — Strong Contrast, Defined Sections, Dark Header/Footer</div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">TaxBack</div>
+      <a href="#" class="header-link">איך זה עובד?</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">שירות עצמי להחזר מס</div>
+      <h1>ייתכן שמגיע לך החזר מס.<br>כדאי לבדוק.</h1>
+      <p>בדיקה מהירה על סמך טופס 106 — תוך דקות תדע אם כדאי לך להגיש בקשה להחזר מס.</p>
+      <div class="cta-group">
+        <button class="btn-primary">בדיקה קצרה — האם כדאי לבדוק החזר מס?</button>
+        <button class="btn-secondary">איך זה עובד?</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust">
+    <div class="trust-row">
+      <div class="trust-badge"><span class="trust-icon">&#10003;</span> שירות עצמי</div>
+      <div class="trust-badge"><span class="trust-icon">&#10003;</span> ללא עמלת הצלחה</div>
+      <div class="trust-badge"><span class="trust-icon">&#10003;</span> אתה שולט בתהליך</div>
+      <div class="trust-badge"><span class="trust-icon">&#9919;</span> מאובטח</div>
+    </div>
+  </section>
+
+  <section class="how-section">
+    <div class="how-inner">
+      <h2>איך זה עובד?</h2>
+      <p class="how-sub">ארבעה שלבים פשוטים — מבדיקה ראשונית ועד הגשה עצמית</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>בדיקה מקדימה</h3>
+          <p>ענה על כמה שאלות קצרות כדי לבדוק אם כדאי להמשיך.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>העלאת טופס 106</h3>
+          <p>העלה את הטופס שקיבלת מהמעסיק. הנתונים נשלפים אוטומטית.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>הפקת טופס 135</h3>
+          <p>המערכת מייצרת את הטופס על סמך הנתונים שבדקת ואישרת.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3>הגשה עצמית</h3>
+          <p>אתה מוריד את הטופס ומגיש בעצמך לרשות המסים.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <div class="faq-inner">
+      <h2>שאלות נפוצות</h2>
+      <div class="faq-item">
+        <div class="faq-q">האם מובטח לי החזר?</div>
+        <div class="faq-a">לא. הבדיקה היא אינדיקטיבית בלבד. הבדיקה הסופית מתבצעת על ידי רשות המסים על סמך הנתונים שתגיש.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">האם אתם מגישים בשבילי?</div>
+        <div class="faq-a">לא. אנחנו מייצרים את הטופס — אתה מגיש בעצמך. אתה שולט בכל שלב בתהליך.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">אילו מסמכים צריך?</div>
+        <div class="faq-a">טופס 106 מהמעסיק שלך. זה המסמך היחיד הנדרש לתחילת הבדיקה.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">כמה זה עולה?</div>
+        <div class="faq-a">מחיר קבוע לכל הפקה. ללא עמלת הצלחה, ללא מנוי, ללא הפתעות.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>
+      <a href="#">מדיניות פרטיות</a>
+      <a href="#">תנאי שימוש</a>
+    </div>
+    <p style="margin-top: 12px;">&copy; 2026 TaxBack. כל הזכויות שמורות.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction A: Minimal Clean</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #FFFFFF;
+    --text: #1A1A2E;
+    --text-secondary: #6B7280;
+    --primary: #0D9488;
+    --primary-hover: #0B7A70;
+    --border: #E5E7EB;
+    --surface: #FFFFFF;
+    --section-alt: #FAFAFA;
+    --radius: 8px;
+    --font: 'Noto Sans Hebrew', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .header-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  /* Hero */
+  .hero {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 32px 64px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .hero p {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    max-width: 540px;
+    margin-inline: auto;
+    margin-bottom: 40px;
+  }
+  .cta-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: background 200ms ease-out;
+  }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    padding: 14px 32px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 400;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: border-color 200ms ease-out;
+  }
+  .btn-secondary:hover { border-color: var(--primary); }
+
+  /* Trust Signals */
+  .trust {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 32px 64px;
+  }
+  .trust-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .trust-badge {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trust-badge .icon {
+    font-size: 18px;
+    opacity: 0.6;
+  }
+
+  /* Divider */
+  .divider {
+    max-width: 720px;
+    margin: 0 auto;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* How it works */
+  .how-section {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 32px;
+  }
+  .how-section h2 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 48px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
+  }
+  .step {
+    text-align: center;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .step h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .step p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* FAQ */
+  .faq-section {
+    background: var(--section-alt);
+    padding: 64px 32px;
+  }
+  .faq-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .faq-inner h2 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  .faq-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    background: white;
+    overflow: hidden;
+  }
+  .faq-q {
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .faq-q::after { content: "+"; color: var(--text-secondary); font-weight: 400; font-size: 20px; }
+  .faq-a {
+    padding: 0 20px 16px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  .footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+  }
+  .footer a { color: var(--text-secondary); margin: 0 12px; }
+
+  /* Label */
+  .mock-label {
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+  <div class="mock-label">DIRECTION A: MINIMAL CLEAN — Maximum Air, Hairline Borders, No Shadows</div>
+
+  <header class="header">
+    <div class="logo">TaxBack</div>
+    <a href="#" class="header-link">איך זה עובד?</a>
+  </header>
+
+  <section class="hero">
+    <h1>ייתכן שמגיע לך החזר מס.<br>כדאי לבדוק.</h1>
+    <p>בדיקה מהירה על סמך טופס 106 — תוך דקות תדע אם כדאי לך להגיש בקשה להחזר מס.</p>
+    <div class="cta-group">
+      <button class="btn-primary">בדיקה קצרה — האם כדאי לבדוק החזר מס?</button>
+      <button class="btn-secondary">איך זה עובד?</button>
+    </div>
+  </section>
+
+  <section class="trust">
+    <div class="trust-row">
+      <div class="trust-badge"><span class="icon">&#9745;</span> שירות עצמי</div>
+      <div class="trust-badge"><span class="icon">&#9745;</span> ללא עמלת הצלחה</div>
+      <div class="trust-badge"><span class="icon">&#9745;</span> אתה שולט בתהליך</div>
+      <div class="trust-badge"><span class="icon">&#10047;</span> מאובטח</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="how-section">
+    <h2>איך זה עובד?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>בדיקה מקדימה</h3>
+        <p>ענה על כמה שאלות קצרות כדי לבדוק אם כדאי להמשיך.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>העלאת טופס 106</h3>
+        <p>העלה את הטופס שקיבלת מהמעסיק. הנתונים נשלפים אוטומטית.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>הפקת טופס 135</h3>
+        <p>המערכת מייצרת את הטופס על סמך הנתונים שבדקת ואישרת.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>הגשה עצמית</h3>
+        <p>אתה מוריד את הטופס ומגיש בעצמך לרשות המסים.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <div class="faq-inner">
+      <h2>שאלות נפוצות</h2>
+      <div class="faq-item">
+        <div class="faq-q">האם מובטח לי החזר?</div>
+        <div class="faq-a">לא. הבדיקה היא אינדיקטיבית בלבד. הבדיקה הסופית מתבצעת על ידי רשות המסים על סמך הנתונים שתגיש.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">האם אתם מגישים בשבילי?</div>
+        <div class="faq-a">לא. אנחנו מייצרים את הטופס — אתה מגיש בעצמך. אתה שולט בכל שלב בתהליך.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">אילו מסמכים צריך?</div>
+        <div class="faq-a">טופס 106 מהמעסיק שלך. זה המסמך היחיד הנדרש לתחילת הבדיקה.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">כמה זה עולה?</div>
+        <div class="faq-a">מחיר קבוע לכל הפקה. ללא עמלת הצלחה, ללא מנוי, ללא הפתעות.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>
+      <a href="#">מדיניות פרטיות</a>
+      <a href="#">תנאי שימוש</a>
+    </div>
+    <p style="margin-top: 12px;">&copy; 2026 TaxBack. כל הזכויות שמורות.</p>
+  </footer>
+</body>
+</html>

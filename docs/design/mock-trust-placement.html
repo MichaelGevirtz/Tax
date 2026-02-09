@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust Signal Placement — 3 Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #FAFAF8;
+    --bg-white: #FFFFFF;
+    --bg-alt: #F5F3F0;
+    --text: #2D2A26;
+    --text-sec: #6B6560;
+    --primary: #2563EB;
+    --primary-hover: #1D4ED8;
+    --primary-light: #EFF6FF;
+    --border: #E8E4DF;
+    --radius: 12px;
+    --font: 'Noto Sans Hebrew', sans-serif;
+  }
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: #E0E0E0;
+    line-height: 1.6;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .option-label {
+    background: #1a1a2e;
+    color: white;
+    text-align: center;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 40px;
+  }
+  .option-label:first-child { margin-top: 0; }
+  .option-desc {
+    background: #2d2a26;
+    color: #ccc;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  /* Hero base */
+  .hero {
+    background: var(--bg-white);
+    padding: 64px 32px 56px;
+    text-align: center;
+  }
+  .hero-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 16px;
+  }
+  .hero .subtitle {
+    font-size: 18px;
+    color: var(--text-sec);
+    max-width: 520px;
+    margin: 0 auto 32px;
+  }
+  .cta-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 16px 36px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    padding: 16px 36px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-family: var(--font);
+    cursor: pointer;
+  }
+  .micro-copy {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-sec);
+  }
+  .micro-copy span::before {
+    content: "✓ ";
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Trust badges section (for options A and C) */
+  .trust-section {
+    padding: 40px 32px;
+    background: var(--bg);
+  }
+  .trust-row {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .trust-badge {
+    background: var(--bg-white);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    padding: 14px 22px;
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .trust-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  /* Inline badges (for option C) */
+  .inline-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .inline-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Separator */
+  .sep {
+    height: 4px;
+    background: #E0E0E0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ OPTION A: Keep Both ============ -->
+<div class="option-label">OPTION A: Keep Both</div>
+<div class="option-desc">Micro-copy under CTA handles fear. Full trust badges section below for scrollers who need more.</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>בדיקה של 2 דקות — לדעת אם כדאי להגיש בקשה להחזר מס</h1>
+    <p class="subtitle">בדיקה מהירה על סמך טופס 106 — תוך דקות תדע אם כדאי לך להגיש בקשה להחזר מס.</p>
+    <div class="cta-group">
+      <button class="btn-primary">התחלת בדיקה</button>
+      <button class="btn-secondary">איך זה עובד?</button>
+    </div>
+    <div class="micro-copy">
+      <span>ללא התחייבות</span>
+      <span>תוך 2 דקות</span>
+      <span>בלי פרטי אשראי</span>
+      <span>בלי צורך לדבר עם אף אחד</span>
+    </div>
+  </div>
+</section>
+
+<section class="trust-section">
+  <div class="trust-row">
+    <div class="trust-badge"><div class="trust-icon">✓</div> שירות עצמי</div>
+    <div class="trust-badge"><div class="trust-icon">✓</div> ללא עמלת הצלחה</div>
+    <div class="trust-badge"><div class="trust-icon">✓</div> אתה שולט בתהליך</div>
+    <div class="trust-badge"><div class="trust-icon">⛨</div> מאובטח</div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ============ OPTION B: Remove Section ============ -->
+<div class="option-label">OPTION B: Remove Section — CTA Micro-Copy Only</div>
+<div class="option-desc">No separate trust badges section. The 4 micro-copy lines handle everything. Cleaner, shorter page.</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>בדיקה של 2 דקות — לדעת אם כדאי להגיש בקשה להחזר מס</h1>
+    <p class="subtitle">בדיקה מהירה על סמך טופס 106 — תוך דקות תדע אם כדאי לך להגיש בקשה להחזר מס.</p>
+    <div class="cta-group">
+      <button class="btn-primary">התחלת בדיקה</button>
+      <button class="btn-secondary">איך זה עובד?</button>
+    </div>
+    <div class="micro-copy">
+      <span>ללא התחייבות</span>
+      <span>תוך 2 דקות</span>
+      <span>בלי פרטי אשראי</span>
+      <span>בלי צורך לדבר עם אף אחד</span>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- ============ OPTION C: Merge Into Hero ============ -->
+<div class="option-label">OPTION C: Merge Into Hero</div>
+<div class="option-desc">Trust badges become inline pills inside the hero, between subtitle and CTA. Everything above the fold.</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>בדיקה של 2 דקות — לדעת אם כדאי להגיש בקשה להחזר מס</h1>
+    <p class="subtitle">בדיקה מהירה על סמך טופס 106 — תוך דקות תדע אם כדאי לך להגיש בקשה להחזר מס.</p>
+    <div class="inline-badges">
+      <span class="inline-badge">✓ שירות עצמי</span>
+      <span class="inline-badge">✓ ללא עמלת הצלחה</span>
+      <span class="inline-badge">✓ אתה שולט בתהליך</span>
+      <span class="inline-badge">✓ מאובטח</span>
+    </div>
+    <div class="cta-group">
+      <button class="btn-primary">התחלת בדיקה</button>
+      <button class="btn-secondary">איך זה עובד?</button>
+    </div>
+    <div class="micro-copy">
+      <span>ללא התחייבות</span>
+      <span>תוך 2 דקות</span>
+      <span>בלי פרטי אשראי</span>
+      <span>בלי צורך לדבר עם אף אחד</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
