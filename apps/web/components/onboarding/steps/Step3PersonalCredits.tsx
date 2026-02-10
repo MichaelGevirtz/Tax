@@ -15,8 +15,20 @@ const OPTIONS: { label: string; value: WizardState["personalCredits"] }[] = [
   { label: "לא רלוונטי", value: "none" },
 ];
 
-const WHY_TEXT =
-  "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.";
+const WHY_TEXT: Record<NonNullable<WizardState["personalCredits"]>, string> = {
+  degree:
+    "לעיתים קיימות הטבות מס בגין לימודים אקדמיים, אך הן לא תמיד מתעדכנות אוטומטית דרך המעסיק.",
+  credits:
+    "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.",
+  none:
+    "נמשיך לבדוק גורמים אחרים שיכולים להשפיע על החזר המס.",
+};
+
+const ACKNOWLEDGMENT: Record<NonNullable<WizardState["personalCredits"]>, string> = {
+  degree: "רשמנו שסיימת תואר או לימודים אקדמיים.",
+  credits: "רשמנו שיש לך נקודות זיכוי אישיות.",
+  none: "רשמנו שאין הטבות או נקודות זיכוי ידועות.",
+};
 
 interface Step3Props {
   selection: WizardState["personalCredits"];
@@ -40,7 +52,13 @@ export function Step3PersonalCredits({ selection, onChange }: Step3Props) {
           />
         ))}
       </div>
-      <WhyBlock text={WHY_TEXT} visible={selection !== null} />
+      {selection && (
+        <p className={styles.helper}>{ACKNOWLEDGMENT[selection]}</p>
+      )}
+      <WhyBlock
+        text={selection ? WHY_TEXT[selection] : ""}
+        visible={selection !== null}
+      />
     </div>
   );
 }
