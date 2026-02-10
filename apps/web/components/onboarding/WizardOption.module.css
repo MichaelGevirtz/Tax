@@ -1,0 +1,53 @@
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 200ms ease-out, background 200ms ease-out;
+  user-select: none;
+}
+
+.option:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+  transition: border-color 200ms ease-out, background 200ms ease-out;
+}
+
+.radio .indicator {
+  border-radius: 50%;
+}
+
+.selected .indicator {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.checkmark {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+.label {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}

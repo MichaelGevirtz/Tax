@@ -1,0 +1,53 @@
+.wizard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.progress {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 200ms ease-out;
+}
+
+.dotActive {
+  background: var(--color-primary);
+}
+
+.dotCompleted {
+  background: var(--color-primary);
+  opacity: 0.5;
+}
+
+.stepLabel {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.stepContent {
+  animation: fadeIn 250ms ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepContent {
+    animation: none;
+  }
+}

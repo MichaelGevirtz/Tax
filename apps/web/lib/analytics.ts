@@ -27,6 +27,22 @@ interface AnalyticsEventOptional {
   warnings_count?: number;
   duration_ms?: number;
   field_name?: string;
+  /** Wizard step identifier (e.g., "step_1") — TASK-UI-004 */
+  step_number?: number;
+  /** Count of selections in a wizard step — TASK-UI-004 */
+  selections_count?: number;
+  /** Total wizard steps completed — TASK-UI-004 */
+  total_steps?: number;
+  /** Count of tax years selected — TASK-UI-004 */
+  years_count?: number;
+  /** Total selections across all wizard steps — TASK-UI-004 */
+  total_selections?: number;
+  /** Last step reached before abandoning wizard — TASK-UI-004 */
+  last_step_id?: string;
+  /** Last step number before abandoning — TASK-UI-004 */
+  last_step_number?: number;
+  /** Step number navigated from (back action) — TASK-UI-004 */
+  from_step_number?: number;
 }
 
 export type AnalyticsEvent = AnalyticsEventBase & AnalyticsEventOptional;

@@ -99,6 +99,15 @@ If unsure whether something is PII: treat it as PII.
 
 ---
 
+## UI Implementation Rules
+
+- Before writing any UI code, read all specs under `docs/ui/` and follow them.
+- Layout: `docs/ui/skill-layout-contract.md` (RTL, logical properties, spacing rhythm, breakpoints)
+- Visual: `docs/ui/skill-visual-quality.md` (motion, surfaces, typography, accessibility)
+- Behavioral: `docs/ui/skill-ui-system.md` (screen layout pattern, hard stops, trust-first copy)
+
+---
+
 ## Scope Control
 
 - Do not introduce new libraries/tools unless a TASK explicitly requires it.

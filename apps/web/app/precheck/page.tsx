@@ -1,17 +1,18 @@
+import { Header } from "../../components/landing/Header";
+import { Footer } from "../../components/landing/Footer";
+import { SectionContainer } from "../../components/shared/SectionContainer";
+import { OnboardingWizard } from "../../components/onboarding/OnboardingWizard";
+
 export default function PrecheckPage() {
   return (
-    <main
-      style={{
-        maxWidth: "var(--max-content-width)",
-        margin: "0 auto",
-        padding: "var(--space-3xl) var(--mobile-padding)",
-        textAlign: "center",
-      }}
-    >
-      <h1>בדיקה מקדימה</h1>
-      <p style={{ color: "var(--color-text-secondary)", marginTop: "var(--space-md)" }}>
-        עמוד זה בבנייה — TASK-UI-002
-      </p>
-    </main>
+    <>
+      <Header />
+      <main>
+        <SectionContainer>
+          <OnboardingWizard />
+        </SectionContainer>
+      </main>
+      <Footer />
+    </>
   );
 }
