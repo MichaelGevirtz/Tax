@@ -18,11 +18,13 @@ const OPTIONS = [
   OPTION_UNSURE,
 ];
 
-const POSITIVE_OPTIONS = [OPTION_MORTGAGE, OPTION_LIFE_INSURANCE, OPTION_BOTH];
 const EXCLUSIVE_OPTIONS = [OPTION_NONE, OPTION_UNSURE];
 
-const WHY_TEXT =
+const WHY_TEXT_DEFAULT =
   "במקרים כאלה קיימים לעיתים תשלומים שעשויים לזכות בהטבות מס, אך הם לא תמיד מנוצלים אוטומטית ודורשים בדיקה יזומה.";
+
+const WHY_TEXT_UNSURE =
+  "זה בסדר אם אתה לא בטוח. בהמשך נבדוק את זה מול המסמכים שתעלה, ואם יהיה צורך נבקש אישור שנתי מתאים.";
 
 interface Step2Props {
   selections: string[];
@@ -72,6 +74,35 @@ export function applyStep2Exclusivity(
     .concat(toggled);
 }
 
+function getAcknowledgment(selections: string[]): string | null {
+  if (selections.length === 0) return null;
+
+  if (selections.includes(OPTION_UNSURE)) {
+    return "רשמנו שאין ודאות לגבי משכנתא או ביטוח חיים.";
+  }
+  if (selections.includes(OPTION_NONE)) {
+    return "רשמנו שלא הייתה משכנתא או ביטוח חיים פרטי.";
+  }
+  if (selections.includes(OPTION_BOTH)) {
+    return "רשמנו שהייתה גם משכנתא וגם ביטוח חיים פרטי.";
+  }
+
+  const hasMortgage = selections.includes(OPTION_MORTGAGE);
+  const hasInsurance = selections.includes(OPTION_LIFE_INSURANCE);
+
+  if (hasMortgage && hasInsurance) {
+    return "רשמנו שהייתה משכנתא וביטוח חיים פרטי באחת מהשנים.";
+  }
+  if (hasMortgage) {
+    return "רשמנו שהייתה משכנתא באחת מהשנים.";
+  }
+  if (hasInsurance) {
+    return "רשמנו שהיה ביטוח חיים פרטי באחת מהשנים.";
+  }
+
+  return null;
+}
+
 export function Step2MortgageInsurance({
   selections,
   onChange,
@@ -79,6 +110,10 @@ export function Step2MortgageInsurance({
   const handleToggle = (option: string) => {
     onChange(applyStep2Exclusivity(selections, option));
   };
+
+  const acknowledgment = getAcknowledgment(selections);
+  const isUnsure = selections.includes(OPTION_UNSURE);
+  const whyText = isUnsure ? WHY_TEXT_UNSURE : WHY_TEXT_DEFAULT;
 
   return (
     <div className={styles.step}>
@@ -96,7 +131,10 @@ export function Step2MortgageInsurance({
           />
         ))}
       </div>
-      <WhyBlock text={WHY_TEXT} visible={selections.length > 0} />
+      {acknowledgment && (
+        <p className={styles.helper}>{acknowledgment}</p>
+      )}
+      <WhyBlock text={whyText} visible={selections.length > 0} />
     </div>
   );
 }
