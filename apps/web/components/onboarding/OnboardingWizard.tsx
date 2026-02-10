@@ -45,7 +45,7 @@ function isStepValid(step: number, state: WizardState): boolean {
     case 2:
       return state.personalCredits.length >= 1;
     case 3:
-      return state.additionalIncome !== null;
+      return state.additionalIncome.length >= 1;
     case 4:
       return state.years.length >= 1;
     default:
@@ -62,7 +62,7 @@ function countSelectionsForStep(step: number, state: WizardState): number {
     case 2:
       return state.personalCredits.length;
     case 3:
-      return state.additionalIncome !== null ? 1 : 0;
+      return state.additionalIncome.length;
     case 4:
       return state.years.length;
     default:
@@ -195,7 +195,7 @@ export function OnboardingWizard() {
       case 3:
         return (
           <Step4AdditionalIncome
-            selection={state.additionalIncome}
+            selections={state.additionalIncome}
             onChange={(v) => updateState("additionalIncome", v)}
           />
         );

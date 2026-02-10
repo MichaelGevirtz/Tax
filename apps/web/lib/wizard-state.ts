@@ -7,12 +7,7 @@ export interface WizardState {
   employmentChanges: string[]; // Step 1
   mortgageAndLifeInsurance: string[]; // Step 2
   personalCredits: string[]; // Step 3
-  additionalIncome:
-    | "capital_markets"
-    | "rent"
-    | "other"
-    | "none"
-    | null; // Step 4
+  additionalIncome: string[]; // Step 4
   years: number[]; // Step 5
 }
 
@@ -20,7 +15,7 @@ export const INITIAL_WIZARD_STATE: WizardState = {
   employmentChanges: [],
   mortgageAndLifeInsurance: [],
   personalCredits: [],
-  additionalIncome: null,
+  additionalIncome: [],
   years: [],
 };
 

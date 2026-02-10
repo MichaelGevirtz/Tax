@@ -15,7 +15,7 @@ function isStepValid(step: number, state: WizardState): boolean {
     case 2:
       return state.personalCredits.length >= 1;
     case 3:
-      return state.additionalIncome !== null;
+      return state.additionalIncome.length >= 1;
     case 4:
       return state.years.length >= 1;
     default:
@@ -96,39 +96,31 @@ describe("wizard step validation", () => {
     });
   });
 
-  describe("Step 4 — Additional Income (single-select, exactly 1)", () => {
-    it("is invalid with null", () => {
+  describe("Step 4 — Additional Income (multi-select, ≥ 1)", () => {
+    it("is invalid with no selections", () => {
       expect(isStepValid(3, INITIAL_WIZARD_STATE)).toBe(false);
     });
 
-    it("is valid with 'capital_markets'", () => {
+    it("is valid with one selection", () => {
       const state: WizardState = {
         ...INITIAL_WIZARD_STATE,
-        additionalIncome: "capital_markets",
+        additionalIncome: ["רווחים משוק ההון"],
       };
       expect(isStepValid(3, state)).toBe(true);
     });
 
-    it("is valid with 'rent'", () => {
+    it("is valid with multiple selections", () => {
       const state: WizardState = {
         ...INITIAL_WIZARD_STATE,
-        additionalIncome: "rent",
+        additionalIncome: ["רווחים משוק ההון", "הכנסה משכר דירה"],
       };
       expect(isStepValid(3, state)).toBe(true);
     });
 
-    it("is valid with 'other'", () => {
+    it("is valid with 'לא היו לי הכנסות נוספות'", () => {
       const state: WizardState = {
         ...INITIAL_WIZARD_STATE,
-        additionalIncome: "other",
-      };
-      expect(isStepValid(3, state)).toBe(true);
-    });
-
-    it("is valid with 'none'", () => {
-      const state: WizardState = {
-        ...INITIAL_WIZARD_STATE,
-        additionalIncome: "none",
+        additionalIncome: ["לא היו לי הכנסות נוספות"],
       };
       expect(isStepValid(3, state)).toBe(true);
     });
