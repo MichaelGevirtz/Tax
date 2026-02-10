@@ -33,7 +33,13 @@ export function Step5TaxYears({ selections, onChange }: Step5Props) {
           />
         ))}
       </div>
-      <p className={styles.helper}>כל שנה נבדקת בנפרד לפי הנתונים שלה.</p>
+      <p className={styles.helper}>
+        כל שנה נבדקת בנפרד על-פי הנתונים הרלוונטיים לאותה שנה.
+        <br />
+        ניתן לבדוק רק שנות מס שהסתיימו — כולל שנת 2025.
+        <br />
+        תוצאות הבדיקה עשויות להיות שונות משנה לשנה.
+      </p>
     </div>
   );
 }
