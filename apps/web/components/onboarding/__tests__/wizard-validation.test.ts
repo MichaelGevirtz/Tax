@@ -13,7 +13,7 @@ function isStepValid(step: number, state: WizardState): boolean {
     case 1:
       return state.mortgageAndLifeInsurance.length >= 1;
     case 2:
-      return state.personalCredits !== null;
+      return state.personalCredits.length >= 1;
     case 3:
       return state.additionalIncome !== null;
     case 4:
@@ -63,31 +63,34 @@ describe("wizard step validation", () => {
     });
   });
 
-  describe("Step 3 — Personal Credits (single-select, exactly 1)", () => {
-    it("is invalid with null", () => {
+  describe("Step 3 — Personal Credits (multi-select, ≥ 1)", () => {
+    it("is invalid with no selections", () => {
       expect(isStepValid(2, INITIAL_WIZARD_STATE)).toBe(false);
     });
 
-    it("is valid with 'degree'", () => {
+    it("is valid with one selection", () => {
       const state: WizardState = {
         ...INITIAL_WIZARD_STATE,
-        personalCredits: "degree",
+        personalCredits: ["סיימתי תואר / לימודים אקדמיים"],
       };
       expect(isStepValid(2, state)).toBe(true);
     });
 
-    it("is valid with 'credits'", () => {
+    it("is valid with multiple selections", () => {
       const state: WizardState = {
         ...INITIAL_WIZARD_STATE,
-        personalCredits: "credits",
+        personalCredits: [
+          "סיימתי תואר / לימודים אקדמיים",
+          "יש לי נקודות זיכוי אישיות (ילדים מתחת לגיל 18, מגבלה, עולה חדש וכד׳)",
+        ],
       };
       expect(isStepValid(2, state)).toBe(true);
     });
 
-    it("is valid with 'none'", () => {
+    it("is valid with 'לא רלוונטי'", () => {
       const state: WizardState = {
         ...INITIAL_WIZARD_STATE,
-        personalCredits: "none",
+        personalCredits: ["לא רלוונטי"],
       };
       expect(isStepValid(2, state)).toBe(true);
     });

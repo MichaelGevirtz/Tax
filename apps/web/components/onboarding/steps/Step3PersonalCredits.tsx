@@ -2,63 +2,96 @@
 
 import { WizardOption } from "../WizardOption";
 import { WhyBlock } from "../WhyBlock";
-import type { WizardState } from "../../../lib/wizard-state";
 import styles from "./steps.module.css";
 
-const OPTIONS: { label: string; value: WizardState["personalCredits"] }[] = [
-  { label: "סיימתי תואר / לימודים אקדמיים", value: "degree" },
-  {
-    label:
-      "יש לי נקודות זיכוי אישיות (ילדים מתחת לגיל 18, מגבלה, עולה חדש וכד׳)",
-    value: "credits",
-  },
-  { label: "לא רלוונטי", value: "none" },
-];
+const OPTION_DEGREE = "סיימתי תואר / לימודים אקדמיים";
+const OPTION_CREDITS =
+  "יש לי נקודות זיכוי אישיות (ילדים מתחת לגיל 18, מגבלה, עולה חדש וכד׳)";
+const OPTION_NONE = "לא רלוונטי";
 
-const WHY_TEXT: Record<NonNullable<WizardState["personalCredits"]>, string> = {
-  degree:
-    "לעיתים קיימות הטבות מס בגין לימודים אקדמיים, אך הן לא תמיד מתעדכנות אוטומטית דרך המעסיק.",
-  credits:
-    "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.",
-  none:
-    "נמשיך לבדוק גורמים אחרים שיכולים להשפיע על החזר המס.",
-};
+const OPTIONS = [OPTION_DEGREE, OPTION_CREDITS, OPTION_NONE];
 
-const ACKNOWLEDGMENT: Record<NonNullable<WizardState["personalCredits"]>, string> = {
-  degree: "רשמנו שסיימת תואר או לימודים אקדמיים.",
-  credits: "רשמנו שיש לך נקודות זיכוי אישיות.",
-  none: "רשמנו שאין הטבות או נקודות זיכוי ידועות.",
-};
+const WHY_TEXT =
+  "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.";
 
-interface Step3Props {
-  selection: WizardState["personalCredits"];
-  onChange: (value: WizardState["personalCredits"]) => void;
+/**
+ * Apply Step 3 exclusivity rules when toggling an option.
+ * "לא רלוונטי" is mutually exclusive with all other options.
+ * Exported for testing.
+ */
+export function applyStep3Exclusivity(
+  current: string[],
+  toggled: string,
+): string[] {
+  // Deselect if already selected
+  if (current.includes(toggled)) {
+    return current.filter((s) => s !== toggled);
+  }
+
+  // Selecting "לא רלוונטי" clears all others
+  if (toggled === OPTION_NONE) {
+    return [toggled];
+  }
+
+  // Selecting any positive option clears "לא רלוונטי"
+  return current.filter((s) => s !== OPTION_NONE).concat(toggled);
 }
 
-export function Step3PersonalCredits({ selection, onChange }: Step3Props) {
+function getAcknowledgment(selections: string[]): string | null {
+  if (selections.length === 0) return null;
+
+  if (selections.includes(OPTION_NONE)) {
+    return "רשמנו שאין הטבות או נקודות זיכוי ידועות.";
+  }
+
+  const hasDegree = selections.includes(OPTION_DEGREE);
+  const hasCredits = selections.includes(OPTION_CREDITS);
+
+  if (hasDegree && hasCredits) {
+    return "רשמנו שסיימת תואר ויש לך נקודות זיכוי אישיות.";
+  }
+  if (hasDegree) {
+    return "רשמנו שסיימת תואר או לימודים אקדמיים.";
+  }
+  if (hasCredits) {
+    return "רשמנו שיש לך נקודות זיכוי אישיות.";
+  }
+
+  return null;
+}
+
+interface Step3Props {
+  selections: string[];
+  onChange: (selections: string[]) => void;
+}
+
+export function Step3PersonalCredits({ selections, onChange }: Step3Props) {
+  const handleToggle = (option: string) => {
+    onChange(applyStep3Exclusivity(selections, option));
+  };
+
+  const acknowledgment = getAcknowledgment(selections);
+
   return (
     <div className={styles.step}>
       <h2 className={styles.question}>
         האם יש לך נקודות זיכוי או הטבות אישיות שייתכן שלא נוצלו?
       </h2>
-      <div className={styles.options} role="radiogroup" aria-label="נקודות זיכוי">
+      <div className={styles.options} role="group" aria-label="נקודות זיכוי">
         {OPTIONS.map((option) => (
           <WizardOption
-            key={option.value}
-            label={option.label}
-            selected={selection === option.value}
-            onToggle={() => onChange(option.value)}
-            mode="radio"
+            key={option}
+            label={option}
+            selected={selections.includes(option)}
+            onToggle={() => handleToggle(option)}
+            mode="checkbox"
           />
         ))}
       </div>
-      {selection && (
-        <p className={styles.helper}>{ACKNOWLEDGMENT[selection]}</p>
+      {acknowledgment && (
+        <p className={styles.helper}>{acknowledgment}</p>
       )}
-      <WhyBlock
-        text={selection ? WHY_TEXT[selection] : ""}
-        visible={selection !== null}
-      />
+      <WhyBlock text={WHY_TEXT} visible={selections.length > 0} />
     </div>
   );
 }

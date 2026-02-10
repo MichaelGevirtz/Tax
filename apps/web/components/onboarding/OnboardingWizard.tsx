@@ -43,7 +43,7 @@ function isStepValid(step: number, state: WizardState): boolean {
     case 1:
       return state.mortgageAndLifeInsurance.length >= 1;
     case 2:
-      return state.personalCredits !== null;
+      return state.personalCredits.length >= 1;
     case 3:
       return state.additionalIncome !== null;
     case 4:
@@ -60,7 +60,7 @@ function countSelectionsForStep(step: number, state: WizardState): number {
     case 1:
       return state.mortgageAndLifeInsurance.length;
     case 2:
-      return state.personalCredits !== null ? 1 : 0;
+      return state.personalCredits.length;
     case 3:
       return state.additionalIncome !== null ? 1 : 0;
     case 4:
@@ -188,7 +188,7 @@ export function OnboardingWizard() {
       case 2:
         return (
           <Step3PersonalCredits
-            selection={state.personalCredits}
+            selections={state.personalCredits}
             onChange={(v) => updateState("personalCredits", v)}
           />
         );
