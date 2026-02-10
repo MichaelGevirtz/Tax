@@ -4,16 +4,55 @@ import { WizardOption } from "../WizardOption";
 import { WhyBlock } from "../WhyBlock";
 import styles from "./steps.module.css";
 
+const OPTION_NO_CHANGE = "לא זכור לי שינוי משמעותי";
+
 const OPTIONS = [
   "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)",
   "החלפת מקום עבודה",
   "עבודה אצל יותר ממעסיק אחד באותה שנה",
   "תקופה ללא עבודה / עבודה חלקית",
-  "לא זכור לי שינוי משמעותי",
+  OPTION_NO_CHANGE,
 ];
 
 const WHY_TEXT =
   "מס הכנסה מחשב מס לפי הנחת הכנסה חודשית אחידה לאורך השנה. שינויים בשכר או בתעסוקה עלולים ליצור פער בין המס שנוכה בפועל לבין המס הנדרש.";
+
+/**
+ * Apply Step 1 exclusivity rules when toggling an option.
+ * "לא זכור לי שינוי משמעותי" is a negation option — mutually exclusive with all others.
+ * Exported for testing.
+ */
+export function applyStep1Exclusivity(
+  current: string[],
+  toggled: string,
+): string[] {
+  // Deselect if already selected
+  if (current.includes(toggled)) {
+    return current.filter((s) => s !== toggled);
+  }
+
+  // Selecting the negation option clears all others
+  if (toggled === OPTION_NO_CHANGE) {
+    return [toggled];
+  }
+
+  // Selecting any positive option clears the negation option
+  return current.filter((s) => s !== OPTION_NO_CHANGE).concat(toggled);
+}
+
+function getAcknowledgment(selections: string[]): string | null {
+  if (selections.length === 0) return null;
+
+  if (selections.includes(OPTION_NO_CHANGE)) {
+    return "רשמנו שלא זכור שינוי משמעותי בתבנית ההעסקה.";
+  }
+
+  if (selections.length === 1) {
+    return "רשמנו שהיה שינוי בתבנית ההעסקה או השכר.";
+  }
+
+  return "רשמנו מספר שינויים בתבנית ההעסקה והשכר.";
+}
 
 interface Step1Props {
   selections: string[];
@@ -22,12 +61,10 @@ interface Step1Props {
 
 export function Step1Employment({ selections, onChange }: Step1Props) {
   const handleToggle = (option: string) => {
-    if (selections.includes(option)) {
-      onChange(selections.filter((s) => s !== option));
-    } else {
-      onChange([...selections, option]);
-    }
+    onChange(applyStep1Exclusivity(selections, option));
   };
+
+  const acknowledgment = getAcknowledgment(selections);
 
   return (
     <div className={styles.step}>
@@ -45,7 +82,10 @@ export function Step1Employment({ selections, onChange }: Step1Props) {
           />
         ))}
       </div>
-      <WhyBlock text={WHY_TEXT} visible={selections.length > 0} />
+      {acknowledgment && (
+        <p className={styles.helper}>{acknowledgment}</p>
+      )}
+      <WhyBlock text={WHY_TEXT} visible={true} />
     </div>
   );
 }
