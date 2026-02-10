@@ -47,6 +47,11 @@
   color: #fff;
 }
 
+.option:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .label {
   font-size: var(--font-size-body);
   line-height: var(--line-height-body);

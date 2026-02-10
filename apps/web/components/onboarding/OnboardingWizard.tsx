@@ -249,6 +249,11 @@ export function OnboardingWizard() {
         secondaryLabel={currentStep > 0 ? "חזרה" : undefined}
         onSecondaryClick={currentStep > 0 ? handleBack : undefined}
       />
+      {!isStepValid(currentStep, state) && (
+        <p className={styles.disabledHint}>
+          יש לבחור לפחות אפשרות אחת כדי להמשיך
+        </p>
+      )}
     </div>
   );
 }

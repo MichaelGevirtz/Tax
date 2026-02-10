@@ -69,7 +69,7 @@ export function Step1Employment({ selections, onChange }: Step1Props) {
   return (
     <div className={styles.step}>
       <h2 className={styles.question}>
-        האם במהלך אחת מהשנים שבחרת היה שינוי בתבנית ההעסקה או השכר שלך?
+        האם במהלך שש השנים האחרונות היה שינוי בתבנית ההעסקה או השכר שלך?
       </h2>
       <div className={styles.options} role="group" aria-label="בחירת שינויים בהעסקה">
         {OPTIONS.map((option) => (
