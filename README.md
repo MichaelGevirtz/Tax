@@ -175,3 +175,16 @@ packages/
 - **Contract tests**: `packages/**/__tests__/contracts/` — API and schema boundary validation
 
 Run all tests: `npx vitest run` from project root.
+
+---
+
+## Audit Commands
+
+Reusable slash commands for quality assurance across pages. Defined in `.claude/commands/` and available in any Claude Code session.
+
+| Command | Usage | Purpose |
+|---------|-------|---------|
+| `/ux-audit <page>` | `/ux-audit wizard` | UX, visual, and trust audit — psychological flow, visual gap analysis, component redesign specs |
+| `/seo-audit <page>` | `/seo-audit landing` | Technical SEO, content structure, Core Web Vitals, Hebrew keyword optimization |
+
+Pass the page or component name as the argument. The command will find relevant source files, read UI specs and competitor references, and produce a prioritized audit with concrete implementation recommendations.
