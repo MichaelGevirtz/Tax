@@ -36,3 +36,26 @@
 **Decision:** Tesseract OCR only (no cloud providers for v1).
 **Reason:** Privacy-first approach keeps PII local, zero per-page cost, sufficient for MVP testing. Cloud alternatives (Google Vision, Azure) documented in `/docs/architecture/ocr-strategy.md` for future consideration if Tesseract accuracy proves insufficient.
 **Eliminated:** AWS Textract (no Hebrew support).
+
+
+## 2026-02-XX — Payment Flow: Option D (Refund-Likelihood Gate)
+
+Decision:
+- Use Refund-Likelihood Gate (Option D, revised).
+- Users see eligibility + confidence before payment.
+- No refund amount is shown pre-payment.
+
+Reason:
+- Exact refund amount cannot be guaranteed vs Tax Authority.
+- Evidence-based eligibility increases trust for SEO traffic.
+- Zero marginal compute cost allows free eligibility stage.
+- Preserves SaaS-first model and avoids service drift.
+
+Rejected:
+- Option C (pay before documents): insufficient trust for new brand.
+- Amount-based gating: misleading and legally risky.
+
+Constraints:
+- No monetary amounts or ranges pre-payment.
+- Payment unlocks execution artifacts only (Form 135 + guide).
+

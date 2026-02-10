@@ -101,3 +101,17 @@ When asked to implement a task:
 - Keep changes localized
 - Add tests with the change (not later)
 - Do not add “helpful” extra refactors unless a TASK requires it
+
+## Payment Flow Guardrails
+
+- Do not display refund amounts or ranges before payment.
+- Pre-payment output is limited to:
+  - Eligibility (binary)
+  - Confidence level (qualitative only; no percentages or monetary implications)
+  - Explanation (non-monetary)
+- Payment unlocks:
+  - Form 135 generation
+  - Submission instructions
+- No tax advice or outcome guarantees.
+- Refund only if post-generation eligibility = false.
+

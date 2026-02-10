@@ -88,6 +88,8 @@
 
 ## מתחרה #3 – finupp (פינאפ)
 
+-- scrrenshots resides in docs\product\finupp.pdf
+
 ### 1. פרטי בסיס
 - סוג: Hybrid – UX טכנולוגי + שירות
 - מודל תשלום:
