@@ -12,8 +12,18 @@ const OPTIONS: { label: string; value: WizardState["additionalIncome"] }[] = [
   { label: "לא היו לי הכנסות נוספות", value: "none" },
 ];
 
-const WHY_TEXT =
-  "הכנסות נוספות משפיעות על חישוב המס הכולל, גם כאשר חלקן פטור ממס או ממוסה בשיעור קבוע.";
+const WHY_TEXT_HAS_INCOME =
+  "הכנסות נוספות משפיעות על חישוב המס הכולל ועשויות לדרוש דיווח נפרד, גם כאשר חלקן פטור ממס או ממוסה בשיעור קבוע.";
+
+const WHY_TEXT_NO_INCOME =
+  "גם כשההכנסה מגיעה רק ממשכורת, בדיקה מלאה של הנתונים יכולה לחשוף פערים בחישוב המס השנתי.";
+
+const ACKNOWLEDGMENT: Record<NonNullable<WizardState["additionalIncome"]>, string> = {
+  capital_markets: "רשמנו שהיו רווחים משוק ההון.",
+  rent: "רשמנו שהייתה הכנסה משכר דירה.",
+  other: "רשמנו שהייתה הכנסה נוספת אחרת.",
+  none: "רשמנו שלא היו הכנסות נוספות מעבר לתלוש השכר.",
+};
 
 interface Step4Props {
   selection: WizardState["additionalIncome"];
@@ -21,6 +31,8 @@ interface Step4Props {
 }
 
 export function Step4AdditionalIncome({ selection, onChange }: Step4Props) {
+  const whyText = selection === "none" ? WHY_TEXT_NO_INCOME : WHY_TEXT_HAS_INCOME;
+
   return (
     <div className={styles.step}>
       <h2 className={styles.question}>
@@ -37,7 +49,10 @@ export function Step4AdditionalIncome({ selection, onChange }: Step4Props) {
           />
         ))}
       </div>
-      <WhyBlock text={WHY_TEXT} visible={selection !== null} />
+      {selection && (
+        <p className={styles.helper}>{ACKNOWLEDGMENT[selection]}</p>
+      )}
+      <WhyBlock text={whyText} visible={selection !== null} />
     </div>
   );
 }
