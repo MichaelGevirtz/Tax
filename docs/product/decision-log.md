@@ -59,3 +59,65 @@ Constraints:
 - No monetary amounts or ranges pre-payment.
 - Payment unlocks execution artifacts only (Form 135 + guide).
 
+2026-02-12 – Mandatory 106 Before Payment + Frictionless Upload Model
+
+Decision:
+
+Form 106 upload is mandatory before payment.
+
+No login required before upload.
+
+Instant automated parsing with immediate on-screen results.
+
+Email required only after successful parsing (before verified results are shown).
+
+Account creation (magic link) occurs only at payment stage.
+
+Flow Definition (Locked v1.1):
+
+Questionnaire (Steps 1–5).
+
+Soft eligibility result (no numbers, no estimates).
+
+106 upload (no progress bar, no requirement to upload all years).
+
+Instant parsing and structured recognition per year.
+
+Email capture (required).
+
+Verified eligibility shown instantly (per-year basis).
+
+Payment unlocks filing package for eligible years only.
+
+Behavioral Rules:
+
+Missing years do not block progression.
+
+Each tax year treated independently.
+
+Users may upload additional 106 files later.
+
+No refund amount displayed pre-payment.
+
+Support Policy:
+
+WhatsApp support available for paid users only.
+
+Scope limited to product usage and generated documents.
+
+No tax advisory or authority representation.
+
+Response times depend on system load.
+
+Reason:
+
+Maximizes 106 acquisition.
+
+Reduces early funnel friction.
+
+Preserves SaaS-first architecture.
+
+Prevents service drift.
+
+Strengthens trust through document-based validation before payment.
+
