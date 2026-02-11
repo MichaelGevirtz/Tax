@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Option A — Minimal Clean — Wizard Redesign</title>
+<style>
+/* ============================
+   Design Tokens (from globals.css)
+   ============================ */
+:root {
+  --color-bg: #FAFAF8;
+  --color-bg-white: #FFFFFF;
+  --color-bg-alt: #F5F3F0;
+  --color-text: #2D2A26;
+  --color-text-secondary: #6B6560;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #EFF6FF;
+  --color-primary-subtle: #DBEAFE;
+  --color-border: #E8E4DF;
+  --color-success: #16A34A;
+  --color-success-light: #F0FDF4;
+  --color-warning: #EA580C;
+  --color-error: #E11D48;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --font-size-body: 17px;
+  --font-size-sm: 14px;
+  --font-size-xs: 13px;
+  --line-height-body: 1.6;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================
+   Mock Navigation
+   ============================ */
+.mock-header {
+  background: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-lg);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.mock-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.mock-header p {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.step-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 65px;
+  z-index: 99;
+  flex-wrap: wrap;
+}
+
+.step-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-white);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  transition: all 200ms ease-out;
+}
+
+.step-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.mock-container {
+  max-width: 760px;
+  margin: var(--space-xl) auto;
+  padding: 0 var(--space-md);
+}
+
+/* ============================
+   Wizard Shell
+   ============================ */
+.wizard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 720px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+/* --- Progress bar (improved) --- */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.segment-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.segment {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  transition: background 300ms ease-out;
+}
+
+.segment.active {
+  background: var(--color-primary);
+}
+
+.segment.completed {
+  background: var(--color-primary);
+}
+
+/* Small dot between segments for active indicator */
+.segment-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  flex-shrink: 0;
+  transition: background 300ms ease-out, box-shadow 300ms ease-out;
+}
+
+.segment-dot.active {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
+}
+
+.segment-dot.completed {
+  background: var(--color-primary);
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.step-title {
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.step-counter {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.trust-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* GEO: micro-explainer for users arriving via AI citation */
+.geo-explainer {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  margin-block-end: var(--space-sm);
+}
+
+/* GEO: freshness date */
+.freshness-date {
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  margin-block-start: var(--space-xs);
+}
+
+/* --- Card surface (improved) --- */
+.card {
+  background: var(--color-bg-white);
+  border-radius: var(--radius);
+  padding: var(--space-xl) var(--space-lg);
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* --- Step content --- */
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  animation: fadeIn 250ms ease-out;
+}
+
+.question {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text);
+  text-align: center;
+}
+
+/* --- Options grid (2-col) --- */
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+/* --- Card tile --- */
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
+  min-height: 110px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 200ms ease-out, background 200ms ease-out, box-shadow 200ms ease-out;
+  user-select: none;
+  text-align: center;
+}
+
+.tile:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* IMPROVED: Stronger selected state */
+.tile.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.tile-icon {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  color: var(--color-text-secondary);
+  transition: color 200ms ease-out;
+}
+
+.tile.selected .tile-icon {
+  color: var(--color-primary);
+}
+
+.tile-label {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.tile.selected .tile-label {
+  font-weight: 600;
+  color: var(--color-primary-hover);
+}
+
+/* Corner badge */
+.badge {
+  position: absolute;
+  inset-inline-end: -8px;
+  inset-block-start: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  animation: badgePop 200ms ease-out;
+}
+
+.badge svg {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+/* --- Negation variant --- */
+.negation {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-alt);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 200ms ease-out, background 200ms ease-out;
+  user-select: none;
+}
+
+.negation:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.negation.selected {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+}
+
+.negation:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.negation-icon {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.negation-label {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+/* --- Pill variant (years) --- */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: border-color 200ms ease-out, background 200ms ease-out, color 200ms ease-out, box-shadow 200ms ease-out;
+  user-select: none;
+  min-width: 100px;
+}
+
+.pill:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.pill.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --- Acknowledgment line --- */
+.ack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-success-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: 500;
+  min-height: 48px;
+  animation: fadeIn 200ms ease-out;
+}
+
+.ack-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* --- WhyBlock (collapsible) --- */
+.why {
+  border-inline-start: 3px solid var(--color-primary);
+  padding: var(--space-md) var(--space-lg);
+  margin-block-start: var(--space-xs);
+  animation: fadeIn 200ms ease-out;
+}
+
+.why-label {
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  margin-block-end: var(--space-xs);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.why-label svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 200ms ease-out;
+}
+
+.why-label.open svg {
+  transform: rotate(90deg);
+}
+
+.why-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+  overflow: hidden;
+  transition: max-height 300ms ease-out, opacity 300ms ease-out;
+}
+
+.why-text.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.why-text.expanded {
+  max-height: 200px;
+  opacity: 1;
+}
+
+/* --- Years summary --- */
+.years-summary {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: 600;
+  min-height: 22px;
+}
+
+/* --- Helper text --- */
+.helper {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+  text-align: center;
+}
+
+/* --- CTA bar --- */
+.cta-bar {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: var(--space-lg) 0;
+}
+
+.cta-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 16px 48px;
+  border-radius: var(--radius);
+  font-size: 17px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  min-width: 200px;
+  transition: background 200ms ease-out;
+}
+
+.cta-primary:hover:not(.disabled) {
+  background: var(--color-primary-hover);
+}
+
+.cta-primary.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.cta-secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 200ms ease-out;
+}
+
+.cta-secondary:hover {
+  color: var(--color-primary);
+}
+
+.disabled-hint {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  width: 100%;
+}
+
+/* ============================
+   Animations
+   ============================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step, .ack, .why, .badge {
+    animation: none;
+  }
+  .why-text {
+    transition: none;
+  }
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 639px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+
+  .question {
+    font-size: 20px;
+  }
+
+  .pill {
+    min-width: 80px;
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+
+  .card {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .cta-bar {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg-white);
+    padding: var(--space-md);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    margin-inline: calc(-1 * var(--space-md));
+  }
+
+  .cta-primary {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tile {
+    min-height: 80px;
+    padding: var(--space-md);
+    flex-direction: row;
+    gap: var(--space-md);
+  }
+
+  .tile-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .tile-label {
+    text-align: start;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="mock-header">
+  <h1>Option A — Minimal Clean</h1>
+  <p>Conservative polish: stronger selected states, elevated card, collapsible WhyBlock, trust badge, improved progress</p>
+</div>
+
+<div class="step-nav">
+  <button class="step-btn active" onclick="showStep(0)">שלב 1</button>
+  <button class="step-btn" onclick="showStep(1)">שלב 2</button>
+  <button class="step-btn" onclick="showStep(2)">שלב 3</button>
+  <button class="step-btn" onclick="showStep(3)">שלב 4</button>
+  <button class="step-btn" onclick="showStep(4)">שלב 5</button>
+</div>
+
+<div class="mock-container">
+  <div id="wizard-root"></div>
+</div>
+
+<script>
+// ============================
+// Data — same content, no text changes
+// ============================
+
+const STEP_TITLES = [
+  "שינוי בתבנית ההעסקה או השכר",
+  "משכנתא וביטוח חיים",
+  "נקודות זיכוי והטבות אישיות",
+  "הכנסות נוספות מעבר לתלוש השכר",
+  "בחירת שנות הבדיקה",
+];
+
+const STEP_QUESTIONS = [
+  "האם במהלך שש השנים האחרונות היה שינוי בתבנית ההעסקה או השכר שלך?",
+  "האם באחת מהשנים היה לך אחד מהדברים הבאים?",
+  "האם יש לך נקודות זיכוי או הטבות אישיות שייתכן שלא נוצלו?",
+  "האם היו לך הכנסות נוספות מעבר לתלוש השכר?",
+  "לאילו שנים תרצה לבדוק?",
+];
+
+const ICONS = {
+  salary: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  switch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h13M9 3l6 6-6 6"/><path d="M21 15H8M15 21l-6-6 6-6"/></svg>',
+  multi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="7" height="18" rx="1"/><rect x="15" y="3" width="7" height="18" rx="1"/><path d="M9 12h6"/></svg>',
+  gap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4M16 2v4"/><path d="M10 16l2 2 4-4" opacity="0.4"/></svg>',
+  none: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>',
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><path d="M9 21v-6h6v6"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>',
+  question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+  degree: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-5-10 5 10 5 10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/><path d="M22 10v6"/></svg>',
+  family: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="10" r="2"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M21 21v-1a3 3 0 00-3-3h-1"/></svg>',
+  plane: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+  access: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.5"/><path d="M12 7v6"/><path d="M8 13l4 4 4-4"/><path d="M7 20h10"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  rental: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><circle cx="12" cy="15" r="2"/><path d="M12 13v-2"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M12 12v2"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+};
+
+const CHECKMARK = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ACK_ICON = '<svg class="ack-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>';
+const CHEVRON = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2l4 4-4 4"/></svg>';
+
+// Step 1
+const S1_OPTS = [
+  { label: "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)", icon: "salary" },
+  { label: "החלפת מקום עבודה", icon: "switch" },
+  { label: "עבודה אצל יותר ממעסיק אחד באותה שנה", icon: "multi" },
+  { label: "תקופה ללא עבודה / עבודה חלקית", icon: "gap" },
+];
+const S1_NEG = "לא זכור לי שינוי משמעותי";
+const S1_WHY = "מס הכנסה מחשב מס לפי הנחת הכנסה חודשית אחידה לאורך השנה. שינויים בשכר או בתעסוקה עלולים ליצור פער בין המס שנוכה בפועל לבין המס הנדרש.";
+
+function s1Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (t === S1_NEG) return [t];
+  return cur.filter(s => s !== S1_NEG).concat(t);
+}
+function s1Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes(S1_NEG)) return "רשמנו שלא זכור שינוי משמעותי בתבנית ההעסקה.";
+  return sel.length === 1 ? "רשמנו שהיה שינוי בתבנית ההעסקה או השכר." : "רשמנו מספר שינויים בתבנית ההעסקה והשכר.";
+}
+
+// Step 2
+const S2_OPTS = [
+  { label: "משכנתא", icon: "house" },
+  { label: "ביטוח חיים פרטי", icon: "shield" },
+  { label: "לא היה לי", icon: "none" },
+  { label: "לא בטוח", icon: "question" },
+];
+const S2_EXCL = ["לא היה לי", "לא בטוח"];
+const S2_WHY = "במקרים כאלה קיימים לעיתים תשלומים שעשויים לזכות בהטבות מס, אך הם לא תמיד מנוצלים אוטומטית ודורשים בדיקה יזומה.";
+const S2_WHY_UNSURE = "זה בסדר אם אתה לא בטוח. בהמשך נבדוק את זה, ואם יהיה צורך נבקש אישור שנתי מתאים.";
+
+function s2Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (S2_EXCL.includes(t)) return [t];
+  return cur.filter(s => !S2_EXCL.includes(s)).concat(t);
+}
+function s2Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes("לא בטוח")) return "רשמנו שאין ודאות לגבי משכנתא או ביטוח חיים.";
+  if (sel.includes("לא היה לי")) return "רשמנו שלא הייתה משכנתא או ביטוח חיים פרטי.";
+  const m = sel.includes("משכנתא"), i = sel.includes("ביטוח חיים פרטי");
+  if (m && i) return "רשמנו שהייתה גם משכנתא וגם ביטוח חיים פרטי.";
+  if (m) return "רשמנו שהייתה משכנתא באחת מהשנים.";
+  if (i) return "רשמנו שהיה ביטוח חיים פרטי באחת מהשנים.";
+  return null;
+}
+
+// Step 3
+const S3_OPTS = [
+  { label: "סיום תואר / לימודים אקדמיים", icon: "degree" },
+  { label: "ילדים מתחת לגיל 18", icon: "family" },
+  { label: "עולה חדש / תושב חוזר", icon: "plane" },
+  { label: "מגבלה רפואית", icon: "access" },
+];
+const S3_NEG = "לא רלוונטי";
+const S3_WHY = "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.";
+
+function s3Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (t === S3_NEG) return [t];
+  return cur.filter(s => s !== S3_NEG).concat(t);
+}
+function s3Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes(S3_NEG)) return "רשמנו שאין הטבות או נקודות זיכוי ידועות.";
+  const parts = sel.filter(s => s !== S3_NEG);
+  if (parts.length === 1) return `רשמנו: ${parts[0]}.`;
+  if (parts.length === 2) return `רשמנו: ${parts[0]} ו${parts[1]}.`;
+  return `רשמנו ${parts.length} נקודות זיכוי שייתכן שלא נוצלו.`;
+}
+
+// Step 4
+const S4_OPTS = [
+  { label: "רווחים משוק ההון", icon: "chart" },
+  { label: "הכנסה משכר דירה", icon: "rental" },
+  { label: "הכנסה נוספת אחרת", icon: "briefcase" },
+];
+const S4_NEG = "לא היו לי הכנסות נוספות";
+const S4_WHY_HAS = "הכנסות נוספות משפיעות על חישוב המס הכולל ועשויות לדרוש דיווח נפרד, גם כאשר חלקן פטור ממס או ממוסה בשיעור קבוע.";
+const S4_WHY_NO = "גם כשההכנסה מגיעה רק ממשכורת, בדיקה מלאה של הנתונים יכולה לחשוף פערים בחישוב המס השנתי.";
+
+function s4Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (t === S4_NEG) return [t];
+  return cur.filter(s => s !== S4_NEG).concat(t);
+}
+function s4Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes(S4_NEG)) return "רשמנו שלא היו הכנסות נוספות מעבר לתלוש השכר.";
+  const parts = sel.filter(s => s !== S4_NEG);
+  if (parts.length === 1) return `רשמנו שהיו ${parts[0]}.`;
+  const last = parts.pop();
+  return `רשמנו שהיו ${parts.join(", ")} ו${last}.`;
+}
+
+// Step 5
+const YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+const S5_HELPER = "כל שנה נבדקת בנפרד על-פי הנתונים הרלוונטיים לאותה שנה.<br>ניתן לבדוק רק שנות מס שהסתיימו — כולל שנת 2025.";
+
+// ============================
+// State
+// ============================
+let selections = [[], [], [], [], []];
+let currentStep = 0;
+let whyOpen = [true, false, false, false]; // Step 1 why starts open
+
+function toggle(stepIdx, option) {
+  const sel = selections[stepIdx];
+  switch (stepIdx) {
+    case 0: selections[0] = s1Excl(sel, option); break;
+    case 1: selections[1] = s2Excl(sel, option); break;
+    case 2: selections[2] = s3Excl(sel, option); break;
+    case 3: selections[3] = s4Excl(sel, option); break;
+    case 4:
+      if (sel.includes(option)) selections[4] = sel.filter(y => y !== option);
+      else selections[4] = [...sel, option].sort();
+      break;
+  }
+  render();
+}
+
+function toggleWhy(stepIdx) {
+  whyOpen[stepIdx] = !whyOpen[stepIdx];
+  render();
+}
+
+function showStep(idx) {
+  currentStep = idx;
+  document.querySelectorAll('.step-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+  render();
+}
+
+// ============================
+// Render
+// ============================
+function render() {
+  const s = currentStep;
+  const sel = selections[s];
+  const valid = sel.length > 0;
+
+  let html = '<div class="wizard">';
+
+  // -- Progress bar --
+  html += '<div class="progress-container">';
+  html += '<div class="progress-row">';
+  for (let i = 0; i < 5; i++) {
+    const segCls = i < s ? 'completed' : (i === s ? 'active' : '');
+    const dotCls = i < s ? 'completed' : (i === s ? 'active' : '');
+    html += `<div class="segment-wrap">`;
+    html += `<div class="segment ${segCls}"></div>`;
+    html += `</div>`;
+    if (i < 4) html += `<div class="segment-dot ${dotCls}"></div>`;
+  }
+  html += '</div>';
+
+  html += '<div class="step-header">';
+  html += `<span class="step-title">${STEP_TITLES[s]}</span>`;
+  html += `<span class="step-counter">(${s + 1}/5)</span>`;
+  html += '</div>';
+
+  // Trust badge on step 1 only
+  if (s === 0) {
+    html += `<div class="trust-badge">${ICONS.clock} כ-2 דקות</div>`;
+  }
+
+  html += '<div class="freshness-date">נכון לפברואר 2026</div>';
+  html += '</div>';
+
+  // -- Card --
+  html += '<div class="card"><div class="step">';
+  html += `<h2 class="question">${STEP_QUESTIONS[s]}</h2>`;
+
+  // GEO: micro-explainer on Step 1 for users arriving via AI recommendation
+  if (s === 0) {
+    html += '<div class="geo-explainer">בדיקת זכאות חינמית להחזר מס · תוצאה תוך 2 דקות · ללא מסירת פרטים אישיים</div>';
+  }
+
+  if (s < 4) {
+    // Steps 1-4
+    const opts = [S1_OPTS, S2_OPTS, S3_OPTS, S4_OPTS][s];
+    const neg = [S1_NEG, null, S3_NEG, S4_NEG][s];
+    const positiveOpts = neg ? opts : opts; // Step 2 has no separate negation
+    const hasNegation = neg !== null;
+
+    // For Step 2, all 4 are equal tiles
+    if (s === 1) {
+      html += '<div class="options">';
+      opts.forEach(opt => {
+        const selected = sel.includes(opt.label);
+        const esc = opt.label.replace(/'/g, "\\'");
+        html += `<div class="tile ${selected ? 'selected' : ''}" onclick="toggle(${s}, '${esc}')">`;
+        html += `<span class="tile-icon">${ICONS[opt.icon]}</span>`;
+        html += `<span class="tile-label">${opt.label}</span>`;
+        if (selected) html += `<span class="badge">${CHECKMARK}</span>`;
+        html += '</div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div class="options">';
+      opts.forEach(opt => {
+        const selected = sel.includes(opt.label);
+        const esc = opt.label.replace(/'/g, "\\'");
+        html += `<div class="tile ${selected ? 'selected' : ''}" onclick="toggle(${s}, '${esc}')">`;
+        html += `<span class="tile-icon">${ICONS[opt.icon]}</span>`;
+        html += `<span class="tile-label">${opt.label}</span>`;
+        if (selected) html += `<span class="badge">${CHECKMARK}</span>`;
+        html += '</div>';
+      });
+      if (hasNegation) {
+        const negSel = sel.includes(neg);
+        const negEsc = neg.replace(/'/g, "\\'");
+        html += `<div class="negation ${negSel ? 'selected' : ''}" onclick="toggle(${s}, '${negEsc}')">`;
+        html += `<span class="negation-icon">${ICONS.none}</span>`;
+        html += `<span class="negation-label">${neg}</span>`;
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    // Ack
+    const ackFns = [s1Ack, s2Ack, s3Ack, s4Ack];
+    const ack = ackFns[s](sel);
+    if (ack) {
+      html += `<div class="ack">${ACK_ICON}<span>${ack}</span></div>`;
+    }
+
+    // Why block (collapsible)
+    const whyVisible = s === 0 ? true : sel.length > 0;
+    if (whyVisible) {
+      const whyText = s === 1
+        ? (sel.includes("לא בטוח") ? S2_WHY_UNSURE : S2_WHY)
+        : s === 3
+          ? (sel.includes(S4_NEG) ? S4_WHY_NO : S4_WHY_HAS)
+          : [S1_WHY, S2_WHY, S3_WHY][s];
+      const isOpen = whyOpen[s];
+      html += '<div class="why">';
+      html += `<div class="why-label ${isOpen ? 'open' : ''}" onclick="toggleWhy(${s})">${CHEVRON} למה זה חשוב?</div>`;
+      html += `<div class="why-text ${isOpen ? 'expanded' : 'collapsed'}">${whyText}</div>`;
+      html += '</div>';
+    }
+  } else {
+    // Step 5 — year pills
+    html += '<div class="pills">';
+    YEARS.forEach(year => {
+      const selected = sel.includes(year);
+      html += `<div class="pill ${selected ? 'selected' : ''}" onclick="toggle(4, ${year})">${year}</div>`;
+    });
+    html += '</div>';
+
+    if (sel.length > 0) {
+      const sorted = [...sel].sort();
+      html += `<div class="years-summary">נבחרו ${sel.length} שנים: ${sorted.join(', ')}</div>`;
+    } else {
+      html += '<div class="years-summary"></div>';
+    }
+
+    html += `<p class="helper">${S5_HELPER}</p>`;
+  }
+
+  html += '</div></div>';
+
+  // -- CTA --
+  html += '<div class="cta-bar">';
+  html += `<button class="cta-primary ${valid ? '' : 'disabled'}">${s === 4 ? 'סיום' : 'המשך'}</button>`;
+  if (s > 0) html += '<button class="cta-secondary">חזרה</button>';
+  html += '</div>';
+  if (!valid) html += '<p class="disabled-hint">יש לבחור לפחות אפשרות אחת כדי להמשיך</p>';
+
+  html += '</div>';
+
+  document.getElementById('wizard-root').innerHTML = html;
+}
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>

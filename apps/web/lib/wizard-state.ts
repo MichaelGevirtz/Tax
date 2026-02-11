@@ -19,7 +19,7 @@ export const INITIAL_WIZARD_STATE: WizardState = {
   years: [],
 };
 
-const STORAGE_KEY = "taxback_precheck_v1";
+const STORAGE_KEY = "taxback_precheck_v2";
 
 export function saveWizardState(state: WizardState): void {
   try {

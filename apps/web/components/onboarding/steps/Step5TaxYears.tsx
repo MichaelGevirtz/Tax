@@ -15,30 +15,35 @@ export function Step5TaxYears({ selections, onChange }: Step5Props) {
     if (selections.includes(year)) {
       onChange(selections.filter((y) => y !== year));
     } else {
-      onChange([...selections, year]);
+      onChange([...selections, year].sort());
     }
   };
+
+  const sorted = [...selections].sort();
 
   return (
     <div className={styles.step}>
       <h2 className={styles.question}>לאילו שנים תרצה לבדוק?</h2>
-      <div className={styles.options} role="group" aria-label="בחירת שנות מס">
+      <div className={styles.pills} role="group" aria-label="בחירת שנות מס">
         {YEARS.map((year) => (
           <WizardOption
             key={year}
             label={String(year)}
             selected={selections.includes(year)}
             onToggle={() => handleToggle(year)}
-            mode="checkbox"
+            variant="pill"
           />
         ))}
       </div>
+      {sorted.length > 0 && (
+        <div className={styles.yearsSummary}>
+          נבחרו {sorted.length} שנים: {sorted.join(", ")}
+        </div>
+      )}
       <p className={styles.helper}>
         כל שנה נבדקת בנפרד על-פי הנתונים הרלוונטיים לאותה שנה.
         <br />
         ניתן לבדוק רק שנות מס שהסתיימו — כולל שנת 2025.
-        <br />
-        תוצאות הבדיקה עשויות להיות שונות משנה לשנה.
       </p>
     </div>
   );

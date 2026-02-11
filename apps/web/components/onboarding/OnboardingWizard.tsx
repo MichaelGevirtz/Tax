@@ -28,14 +28,6 @@ const STEP_IDS = [
   "step_5",
 ] as const;
 
-const STEP_TITLES = [
-  "שינוי בתבנית ההעסקה או השכר",
-  "משכנתא וביטוח חיים",
-  "נקודות זיכוי והטבות אישיות",
-  "הכנסות נוספות מעבר לתלוש השכר",
-  "בחירת שנות הבדיקה",
-];
-
 function isStepValid(step: number, state: WizardState): boolean {
   switch (step) {
     case 0:
@@ -140,7 +132,6 @@ export function OnboardingWizard() {
     if (currentStep < TOTAL_STEPS - 1) {
       setCurrentStep((s) => s + 1);
     } else {
-      // Wizard completed
       trackEvent("wizard_completed", {
         step_id: STEP_IDS[currentStep],
         total_steps: TOTAL_STEPS,
@@ -215,45 +206,57 @@ export function OnboardingWizard() {
 
   return (
     <div className={styles.wizard}>
-      {/* Progress dots */}
-      <div className={styles.progress} role="progressbar" aria-valuenow={currentStep + 1} aria-valuemin={1} aria-valuemax={TOTAL_STEPS}>
-        {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-          <div
-            key={i}
-            className={[
-              styles.dot,
-              i === currentStep ? styles.dotActive : "",
-              i < currentStep ? styles.dotCompleted : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
+      <div className={styles.wizardBody}>
+        {/* Dot progress indicator */}
+        <div className={styles.stepIndicator}>
+          <div className={styles.stepDots} role="progressbar" aria-valuenow={currentStep + 1} aria-valuemin={1} aria-valuemax={TOTAL_STEPS}>
+            {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+              <div
+                key={i}
+                className={[
+                  styles.dot,
+                  i === currentStep ? styles.dotActive : "",
+                  i < currentStep ? styles.dotCompleted : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              />
+            ))}
+          </div>
+          <span className={styles.stepFraction}>
+            {currentStep + 1}/{TOTAL_STEPS}
+          </span>
+        </div>
+
+        {/* GEO micro-explainer on Step 1 */}
+        {currentStep === 0 && (
+          <div className={styles.geoExplainer}>
+            בדיקת זכאות חינמית להחזר מס · תוצאה תוך 2 דקות · ללא מסירת פרטים אישיים
+          </div>
+        )}
+
+        {/* Step content */}
+        <div key={currentStep} className={styles.stepContent}>
+          {renderStep()}
+        </div>
+
+        {/* CTA area */}
+        <div className={styles.ctaArea}>
+          <CTABar
+            primaryLabel={isLastStep ? "סיום" : "המשך"}
+            onPrimaryClick={handleNext}
+            primaryDisabled={!isStepValid(currentStep, state)}
+            secondaryLabel={currentStep > 0 ? "חזרה" : undefined}
+            onSecondaryClick={currentStep > 0 ? handleBack : undefined}
+            trustFooter={currentStep === 0}
           />
-        ))}
+          {!isStepValid(currentStep, state) && (
+            <p className={styles.disabledHint}>
+              יש לבחור לפחות אפשרות אחת כדי להמשיך
+            </p>
+          )}
+        </div>
       </div>
-
-      {/* Step label */}
-      <div className={styles.stepLabel}>
-        שלב {currentStep + 1} מתוך {TOTAL_STEPS} — {STEP_TITLES[currentStep]}
-      </div>
-
-      {/* Step content */}
-      <div key={currentStep} className={styles.stepContent}>
-        {renderStep()}
-      </div>
-
-      {/* Navigation */}
-      <CTABar
-        primaryLabel={isLastStep ? "סיום" : "המשך"}
-        onPrimaryClick={handleNext}
-        primaryDisabled={!isStepValid(currentStep, state)}
-        secondaryLabel={currentStep > 0 ? "חזרה" : undefined}
-        onSecondaryClick={currentStep > 0 ? handleBack : undefined}
-      />
-      {!isStepValid(currentStep, state) && (
-        <p className={styles.disabledHint}>
-          יש לבחור לפחות אפשרות אחת כדי להמשיך
-        </p>
-      )}
     </div>
   );
 }

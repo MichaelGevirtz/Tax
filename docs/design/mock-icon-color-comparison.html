@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icon Color Comparison — A vs B</title>
+<style>
+:root {
+  --color-bg: #FAFAF8;
+  --color-bg-white: #FFFFFF;
+  --color-bg-alt: #EDEAE6;
+  --color-text: #2D2A26;
+  --color-text-secondary: #6B6560;
+  --color-primary: #2563EB;
+  --color-primary-subtle: #C9DDFB;
+  --color-border: #D5D0CA;
+  --color-success: #16A34A;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --font-size-body: 17px;
+  --font-size-sm: 14px;
+  --font-size-xs: 13px;
+
+  /* Semantic icon colors (Option B) */
+  --icon-financial: #4B7BE5;
+  --icon-property: #B45309;
+  --icon-personal: #B44669;
+  --icon-neutral: #8C857D;
+
+  /* Tinted mono (Option A) */
+  --icon-mono: rgba(37, 99, 235, 0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+h1 {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xl);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+}
+
+.col-label {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Option card (from Option B conversational) */
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  min-height: 60px;
+  user-select: none;
+  cursor: pointer;
+  transition: border-color 200ms, background 200ms;
+}
+
+.option-card:hover {
+  border-color: var(--color-primary);
+  background: #EFF6FF;
+}
+
+.option-card.selected {
+  border-color: var(--color-primary);
+  border-inline-start-width: 4px;
+  background: var(--color-primary-subtle);
+}
+
+.option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: background 200ms, color 200ms;
+}
+
+.option-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.option-text {
+  flex: 1;
+  font-size: var(--font-size-body);
+  line-height: 1.4;
+}
+
+.option-card.selected .option-text {
+  font-weight: 600;
+}
+
+.option-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.option-card.selected .option-check {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.option-check svg {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+/* -- Negation card -- */
+.option-card.negation {
+  background: var(--color-bg-alt);
+  border-color: transparent;
+}
+
+.option-card.negation .option-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* =====================
+   OPTION A: Tinted Mono
+   ===================== */
+.mono .option-icon {
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--icon-mono);
+}
+
+.mono .option-card.selected .option-icon {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.mono .negation .option-icon {
+  background: transparent;
+  color: var(--icon-neutral);
+}
+
+/* =====================
+   OPTION B: Semantic Colors
+   ===================== */
+.semantic .option-icon.financial {
+  background: rgba(75, 123, 229, 0.1);
+  color: var(--icon-financial);
+}
+.semantic .option-icon.property {
+  background: rgba(180, 83, 9, 0.1);
+  color: var(--icon-property);
+}
+.semantic .option-icon.personal {
+  background: rgba(180, 70, 105, 0.1);
+  color: var(--icon-personal);
+}
+.semantic .option-icon.neutral {
+  background: rgba(140, 133, 125, 0.08);
+  color: var(--icon-neutral);
+}
+
+.semantic .option-card.selected .option-icon {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.semantic .negation .option-icon {
+  background: transparent;
+  color: var(--icon-neutral);
+}
+
+/* Section dividers */
+.section-title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin: var(--space-xs) 0;
+}
+.separator::before, .separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+@media (max-width: 639px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1>Icon Colors — A vs B</h1>
+  <p class="subtitle">Click cards to see selected state. Both go to white-on-blue when selected.</p>
+
+  <div class="columns">
+    <!-- OPTION A: Tinted Mono -->
+    <div class="mono">
+      <div class="col-label">A — Tinted Monochrome</div>
+
+      <div class="section-title">שלב 1 — שינוי בהעסקה</div>
+      <div class="options-list" id="mono-s1"></div>
+
+      <div class="section-title">שלב 2 — משכנתא וביטוח</div>
+      <div class="options-list" id="mono-s2"></div>
+
+      <div class="section-title">שלב 3 — נקודות זיכוי</div>
+      <div class="options-list" id="mono-s3"></div>
+
+      <div class="section-title">שלב 4 — הכנסות נוספות</div>
+      <div class="options-list" id="mono-s4"></div>
+    </div>
+
+    <!-- OPTION B: Semantic -->
+    <div class="semantic">
+      <div class="col-label">B — Muted Semantic</div>
+
+      <div class="section-title">שלב 1 — שינוי בהעסקה</div>
+      <div class="options-list" id="sem-s1"></div>
+
+      <div class="section-title">שלב 2 — משכנתא וביטוח</div>
+      <div class="options-list" id="sem-s2"></div>
+
+      <div class="section-title">שלב 3 — נקודות זיכוי</div>
+      <div class="options-list" id="sem-s3"></div>
+
+      <div class="section-title">שלב 4 — הכנסות נוספות</div>
+      <div class="options-list" id="sem-s4"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHK = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const ICONS = {
+  salary: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  switch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h13M9 3l6 6-6 6"/><path d="M21 15H8M15 21l-6-6 6-6"/></svg>',
+  multi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="7" height="18" rx="1"/><rect x="15" y="3" width="7" height="18" rx="1"/><path d="M9 12h6"/></svg>',
+  gap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4M16 2v4"/></svg>',
+  none: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>',
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><path d="M9 21v-6h6v6"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+  degree: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-5-10 5 10 5 10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/><path d="M22 10v6"/></svg>',
+  family: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="10" r="2"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M21 21v-1a3 3 0 00-3-3h-1"/></svg>',
+  plane: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+  access: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.5"/><path d="M12 7v6"/><path d="M8 13l4 4 4-4"/><path d="M7 20h10"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  rental: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><circle cx="12" cy="15" r="2"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>',
+};
+
+// Category assignments for semantic colors
+const ICON_CATEGORY = {
+  salary: 'financial', switch: 'financial', multi: 'financial', gap: 'financial',
+  house: 'property', rental: 'property',
+  shield: 'neutral', question: 'neutral', none: 'neutral',
+  degree: 'personal', family: 'personal', plane: 'personal', access: 'personal',
+  chart: 'financial', briefcase: 'financial',
+};
+
+const STEPS = [
+  {
+    opts: [
+      { label: "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)", icon: "salary" },
+      { label: "החלפת מקום עבודה", icon: "switch" },
+      { label: "עבודה אצל יותר ממעסיק אחד באותה שנה", icon: "multi" },
+      { label: "תקופה ללא עבודה / עבודה חלקית", icon: "gap" },
+    ],
+    neg: { label: "לא זכור לי שינוי משמעותי", icon: "none" },
+  },
+  {
+    opts: [
+      { label: "משכנתא", icon: "house" },
+      { label: "ביטוח חיים פרטי", icon: "shield" },
+    ],
+    neg: null,
+    dismissive: [
+      { label: "לא היה לי", icon: "none" },
+      { label: "לא בטוח", icon: "question" },
+    ],
+  },
+  {
+    opts: [
+      { label: "סיום תואר / לימודים אקדמיים", icon: "degree" },
+      { label: "ילדים מתחת לגיל 18", icon: "family" },
+      { label: "עולה חדש / תושב חוזר", icon: "plane" },
+      { label: "מגבלה רפואית", icon: "access" },
+    ],
+    neg: { label: "לא רלוונטי", icon: "none" },
+  },
+  {
+    opts: [
+      { label: "רווחים משוק ההון", icon: "chart" },
+      { label: "הכנסה משכר דירה", icon: "rental" },
+      { label: "הכנסה נוספת אחרת", icon: "briefcase" },
+    ],
+    neg: { label: "לא היו לי הכנסות נוספות", icon: "none" },
+  },
+];
+
+// State: track selected per side per step
+const selected = {
+  mono: [[], [], [], []],
+  sem: [[], [], [], []],
+};
+
+function toggleSel(side, step, label) {
+  const arr = selected[side][step];
+  const idx = arr.indexOf(label);
+  if (idx >= 0) arr.splice(idx, 1);
+  else arr.push(label);
+  renderAll();
+}
+
+function renderCard(side, stepIdx, opt, isNeg) {
+  const sel = selected[side][stepIdx].includes(opt.label);
+  const esc = opt.label.replace(/'/g, "\\'");
+  const negCls = isNeg ? 'negation' : '';
+  const selCls = sel ? 'selected' : '';
+  const cat = ICON_CATEGORY[opt.icon] || 'neutral';
+
+  // For semantic side, add category class to icon
+  const iconCls = side === 'sem' ? cat : '';
+
+  return `<div class="option-card ${negCls} ${selCls}" onclick="toggleSel('${side}', ${stepIdx}, '${esc}')">
+    <span class="option-icon ${iconCls}">${ICONS[opt.icon]}</span>
+    <span class="option-text">${opt.label}</span>
+    <span class="option-check">${sel ? CHK : ''}</span>
+  </div>`;
+}
+
+function renderStep(side, stepIdx) {
+  const step = STEPS[stepIdx];
+  let html = '';
+
+  step.opts.forEach(opt => { html += renderCard(side, stepIdx, opt, false); });
+
+  if (step.dismissive) {
+    html += '<div class="separator">או</div>';
+    step.dismissive.forEach(opt => { html += renderCard(side, stepIdx, opt, true); });
+  }
+
+  if (step.neg) {
+    html += '<div class="separator">או</div>';
+    html += renderCard(side, stepIdx, step.neg, true);
+  }
+
+  return html;
+}
+
+function renderAll() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById(`mono-s${i+1}`).innerHTML = renderStep('mono', i);
+    document.getElementById(`sem-s${i+1}`).innerHTML = renderStep('sem', i);
+  }
+}
+
+renderAll();
+</script>
+
+</body>
+</html>

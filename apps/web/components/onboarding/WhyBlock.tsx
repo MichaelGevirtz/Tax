@@ -10,8 +10,7 @@ export function WhyBlock({ text, visible }: WhyBlockProps) {
 
   return (
     <div className={styles.container} role="note">
-      <div className={styles.label}>למה זה חשוב?</div>
-      <div className={styles.text}>{text}</div>
+      {text}
     </div>
   );
 }

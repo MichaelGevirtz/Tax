@@ -2,16 +2,24 @@
 
 import { WizardOption } from "../WizardOption";
 import { WhyBlock } from "../WhyBlock";
+import {
+  IconSalary,
+  IconSwitch,
+  IconMulti,
+  IconGap,
+  IconNone,
+} from "../icons";
+import type { IconCategory } from "../icons";
+import type { ReactNode } from "react";
 import styles from "./steps.module.css";
 
 const OPTION_NO_CHANGE = "לא זכור לי שינוי משמעותי";
 
-const OPTIONS = [
-  "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)",
-  "החלפת מקום עבודה",
-  "עבודה אצל יותר ממעסיק אחד באותה שנה",
-  "תקופה ללא עבודה / עבודה חלקית",
-  OPTION_NO_CHANGE,
+const POSITIVE_OPTIONS: { label: string; icon: ReactNode; iconColor: IconCategory }[] = [
+  { label: "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)", icon: <IconSalary />, iconColor: "financial" },
+  { label: "החלפת מקום עבודה", icon: <IconSwitch />, iconColor: "financial" },
+  { label: "עבודה אצל יותר ממעסיק אחד באותה שנה", icon: <IconMulti />, iconColor: "financial" },
+  { label: "תקופה ללא עבודה / עבודה חלקית", icon: <IconGap />, iconColor: "financial" },
 ];
 
 const WHY_TEXT =
@@ -26,33 +34,32 @@ export function applyStep1Exclusivity(
   current: string[],
   toggled: string,
 ): string[] {
-  // Deselect if already selected
   if (current.includes(toggled)) {
     return current.filter((s) => s !== toggled);
   }
-
-  // Selecting the negation option clears all others
   if (toggled === OPTION_NO_CHANGE) {
     return [toggled];
   }
-
-  // Selecting any positive option clears the negation option
   return current.filter((s) => s !== OPTION_NO_CHANGE).concat(toggled);
 }
 
 function getAcknowledgment(selections: string[]): string | null {
   if (selections.length === 0) return null;
-
   if (selections.includes(OPTION_NO_CHANGE)) {
     return "רשמנו שלא זכור שינוי משמעותי בתבנית ההעסקה.";
   }
-
   if (selections.length === 1) {
     return "רשמנו שהיה שינוי בתבנית ההעסקה או השכר.";
   }
-
   return "רשמנו מספר שינויים בתבנית ההעסקה והשכר.";
 }
+
+const AckIcon = (
+  <svg className={styles.ackIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M8 12l3 3 5-5" />
+  </svg>
+);
 
 interface Step1Props {
   selections: string[];
@@ -72,20 +79,37 @@ export function Step1Employment({ selections, onChange }: Step1Props) {
         האם במהלך שש השנים האחרונות היה שינוי בתבנית ההעסקה או השכר שלך?
       </h2>
       <div className={styles.options} role="group" aria-label="בחירת שינויים בהעסקה">
-        {OPTIONS.map((option) => (
+        {POSITIVE_OPTIONS.map((opt) => (
           <WizardOption
-            key={option}
-            label={option}
-            selected={selections.includes(option)}
-            onToggle={() => handleToggle(option)}
-            mode="checkbox"
+            key={opt.label}
+            label={opt.label}
+            icon={opt.icon}
+            iconColor={opt.iconColor}
+            selected={selections.includes(opt.label)}
+            onToggle={() => handleToggle(opt.label)}
+            variant="card"
           />
         ))}
+        <div className={styles.separator}>או</div>
+        <WizardOption
+          label={OPTION_NO_CHANGE}
+          icon={<IconNone />}
+          selected={selections.includes(OPTION_NO_CHANGE)}
+          onToggle={() => handleToggle(OPTION_NO_CHANGE)}
+          variant="negation"
+        />
       </div>
-      {acknowledgment && (
-        <p className={styles.helper}>{acknowledgment}</p>
+      {selections.length > 0 && (
+        <div className={styles.feedback}>
+          {acknowledgment && (
+            <div className={styles.ack}>
+              {AckIcon}
+              <span>{acknowledgment}</span>
+            </div>
+          )}
+          <WhyBlock text={WHY_TEXT} visible={true} />
+        </div>
       )}
-      <WhyBlock text={WHY_TEXT} visible={true} />
     </div>
   );
 }

@@ -3,7 +3,7 @@
   /* Backgrounds */
   --color-bg: #FAFAF8;
   --color-bg-white: #FFFFFF;
-  --color-bg-alt: #F5F3F0;
+  --color-bg-alt: #EDEAE6;
 
   /* Text */
   --color-text: #2D2A26;
@@ -13,9 +13,16 @@
   --color-primary: #2563EB;
   --color-primary-hover: #1D4ED8;
   --color-primary-light: #EFF6FF;
+  --color-primary-subtle: #C9DDFB;
 
   /* Borders */
-  --color-border: #E8E4DF;
+  --color-border: #D5D0CA;
+
+  /* Semantic icon colors */
+  --icon-financial: #4B7BE5;
+  --icon-property: #B45309;
+  --icon-personal: #B44669;
+  --icon-neutral: #8C857D;
 
   /* Semantic */
   --color-success: #16A34A;
@@ -28,6 +35,7 @@
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
   --radius: 12px;
   --radius-sm: 8px;
+  --radius-pill: 999px;
 
   /* Spacing (multiples of 4px) */
   --space-xs: 4px;

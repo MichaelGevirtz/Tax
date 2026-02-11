@@ -1,34 +1,47 @@
+/* Wizard page — white bg, no card surface */
 .wizard {
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
-  max-width: 720px;
-  margin-inline: auto;
-  width: 100%;
+  background: var(--color-bg-white);
 }
 
-.disabledHint {
-  text-align: center;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-top: calc(-1 * var(--space-sm));
-}
-
-.progress {
+.wizardBody {
+  flex: 1;
   display: flex;
-  gap: var(--space-xs);
+  flex-direction: column;
+  max-width: 580px;
+  width: 100%;
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+/* Dot progress indicator */
+.stepIndicator {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  gap: var(--space-sm);
+  margin-block-end: var(--space-2xl);
+}
+
+.stepDots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--color-border);
-  transition: background 200ms ease-out;
+  transition: all 300ms ease-out;
 }
 
 .dotActive {
+  width: 28px;
+  border-radius: 4px;
   background: var(--color-primary);
 }
 
@@ -37,14 +50,39 @@
   opacity: 0.5;
 }
 
-.stepLabel {
-  text-align: center;
-  font-size: var(--font-size-sm);
+.stepFraction {
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-inline-start: var(--space-sm);
 }
 
+
+/* GEO micro-explainer */
+.geoExplainer {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-block-end: var(--space-lg);
+}
+
+/* Step content fade */
 .stepContent {
   animation: fadeIn 250ms ease-out;
+}
+
+/* CTA area pushed to bottom */
+.ctaArea {
+  margin-block-start: auto;
+  padding-block-start: var(--space-xl);
+}
+
+.disabledHint {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-block-start: var(--space-sm);
 }
 
 @keyframes fadeIn {
@@ -53,6 +91,23 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 639px) {
+  .wizardBody {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .ctaArea {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg-white);
+    padding: var(--space-md);
+    margin-inline: calc(-1 * var(--space-md));
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+    z-index: 10;
   }
 }
 

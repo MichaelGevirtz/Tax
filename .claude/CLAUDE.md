@@ -105,6 +105,12 @@ If unsure whether something is PII: treat it as PII.
 - Layout: `docs/ui/skill-layout-contract.md` (RTL, logical properties, spacing rhythm, breakpoints)
 - Visual: `docs/ui/skill-visual-quality.md` (motion, surfaces, typography, accessibility)
 - Behavioral: `docs/ui/skill-ui-system.md` (screen layout pattern, hard stops, trust-first copy)
+- Also read: `.claude/design-system/ui-rules.md` (core UI contract) + `.claude/design-system/copy-rules.he.md` (Hebrew copy rules)
+- Before committing UI changes: run the checklist in `.claude/design-system/ui-checklist.md`
+- For new screens: fill `.claude/design-system/page-spec-template.md` before coding
+- For SEO/content pages: also load `.claude/design-system/seo-geo.md`
+- For new slash commands: follow `.claude/COMMANDS_TEMPLATE.md`
+- Full index: `.claude/design-system/README.md`
 
 ---
 

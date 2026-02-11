@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wizard Redesign Mock — Before/After</title>
+<style>
+/* ============================
+   Design Tokens (from globals.css)
+   ============================ */
+:root {
+  --color-bg: #FAFAF8;
+  --color-bg-white: #FFFFFF;
+  --color-bg-alt: #F5F3F0;
+  --color-text: #2D2A26;
+  --color-text-secondary: #6B6560;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #EFF6FF;
+  --color-primary-subtle: #DBEAFE;
+  --color-border: #E8E4DF;
+  --color-success: #16A34A;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --font-size-body: 17px;
+  --font-size-sm: 14px;
+  --font-size-xs: 13px;
+  --line-height-body: 1.6;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================
+   Page Layout
+   ============================ */
+.page-header {
+  background: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-lg);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.page-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.toggle-bar {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 55px;
+  z-index: 99;
+}
+
+.toggle-btn {
+  padding: 10px 24px;
+  border: 2px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg-white);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  transition: all 200ms ease-out;
+}
+
+.toggle-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.toggle-btn:hover:not(.active) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.step-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.step-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-white);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  transition: all 200ms ease-out;
+}
+
+.step-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.comparison {
+  display: flex;
+  gap: var(--space-xl);
+  max-width: 1600px;
+  margin: var(--space-xl) auto;
+  padding: 0 var(--space-lg);
+}
+
+.comparison.single {
+  max-width: 800px;
+}
+
+.column {
+  flex: 1;
+  min-width: 0;
+}
+
+.column-label {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+}
+
+.column-label.before { color: #B91C1C; background: #FEF2F2; }
+.column-label.after { color: var(--color-success); background: #F0FDF4; }
+
+/* ============================
+   CURRENT (Before) Styles
+   ============================ */
+.current-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 720px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.current-progress {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: center;
+}
+
+.current-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+}
+.current-dot.active { background: var(--color-primary); }
+.current-dot.completed { background: var(--color-primary); opacity: 0.5; }
+
+.current-step-label {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.current-step { display: flex; flex-direction: column; gap: var(--space-md); }
+
+.current-question {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.current-options { display: flex; flex-direction: column; gap: var(--space-sm); }
+
+.current-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 200ms, background 200ms;
+  user-select: none;
+}
+
+.current-option:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.current-option.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.current-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+  transition: border-color 200ms, background 200ms;
+}
+
+.current-option.selected .current-indicator {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.current-checkmark {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+.current-option-label {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.current-helper {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+.current-why {
+  background: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  margin-block-start: var(--space-md);
+}
+
+.current-why-label {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  margin-block-end: var(--space-xs);
+}
+
+.current-why-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+.current-cta-bar {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  padding: var(--space-md) 0;
+}
+
+.current-cta-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.current-cta-primary.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.current-cta-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  padding: 14px 32px;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.current-disabled-hint {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ============================
+   REDESIGNED (After) Styles
+   ============================ */
+.new-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 720px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+/* Segmented progress bar */
+.new-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.new-progress {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.new-segment {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
+  transition: background 300ms ease-out;
+}
+
+.new-segment.active { background: var(--color-primary); }
+.new-segment.completed { background: var(--color-primary); opacity: 0.6; }
+
+.new-step-label {
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  font-weight: 600;
+  text-align: center;
+}
+
+.new-step-counter {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+/* Card surface */
+.new-card {
+  background: var(--color-bg-white);
+  border-radius: var(--radius);
+  padding: var(--space-xl) var(--space-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.new-step { display: flex; flex-direction: column; gap: var(--space-lg); }
+
+.new-question {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text);
+  text-align: center;
+}
+
+/* Grid layout for options */
+.new-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+.new-options.three-col { grid-template-columns: repeat(3, 1fr); }
+.new-options.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: center;
+}
+
+/* Card tile option */
+.new-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md);
+  min-height: 100px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 200ms ease-out, background 200ms ease-out, box-shadow 200ms ease-out;
+  user-select: none;
+  text-align: center;
+}
+
+.new-option:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.new-option.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.new-option-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-text-secondary);
+  transition: color 200ms ease-out;
+}
+
+.new-option.selected .new-option-icon {
+  color: var(--color-primary);
+}
+
+.new-option-label {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+/* Selected badge */
+.new-selected-badge {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  inset-inline-start: auto;
+  inset-inline-end: -7px;
+  inset-block-start: -7px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  animation: badgePop 200ms ease-out;
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+.new-selected-badge svg {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+/* Year pill */
+.new-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border: 2px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: all 200ms ease-out;
+  user-select: none;
+  min-width: 100px;
+  position: relative;
+}
+
+.new-pill:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.new-pill.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Negation option — full width, muted */
+.new-option.negation {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  min-height: auto;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-alt);
+  border-color: transparent;
+  gap: var(--space-md);
+}
+
+.new-option.negation:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+}
+
+.new-option.negation.selected {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+  box-shadow: none;
+}
+
+.new-option.negation .new-option-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* WhyBlock redesigned */
+.new-why {
+  border-inline-start: 3px solid var(--color-primary);
+  padding: var(--space-md) var(--space-lg);
+  margin-block-start: var(--space-sm);
+}
+
+.new-why-label {
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  margin-block-end: var(--space-xs);
+  letter-spacing: 0.02em;
+}
+
+.new-why-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+}
+
+/* Acknowledgment line */
+.new-ack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: #F0FDF4;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+.new-ack-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* CTA bar */
+.new-cta-bar {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-lg) 0;
+}
+
+.new-cta-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 16px 48px;
+  border-radius: var(--radius);
+  font-size: 17px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  min-width: 200px;
+  transition: background 200ms ease-out;
+}
+
+.new-cta-primary:hover { background: var(--color-primary-hover); }
+
+.new-cta-primary.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.new-cta-secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 200ms ease-out;
+}
+
+.new-cta-secondary:hover { color: var(--color-primary); }
+
+/* Helper text */
+.new-helper {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+  text-align: center;
+}
+
+.new-years-summary {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: 600;
+  min-height: 22px;
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 700px) {
+  .comparison { flex-direction: column; }
+  .new-options { grid-template-columns: 1fr; }
+  .new-options.three-col { grid-template-columns: repeat(2, 1fr); }
+  .new-question { font-size: 20px; }
+  .new-pill { min-width: 80px; padding: 12px 20px; font-size: 16px; }
+}
+
+/* ============================
+   View mode controls
+   ============================ */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Wizard Redesign Mock — Before / After</h1>
+</div>
+
+<div class="toggle-bar">
+  <button class="toggle-btn active" onclick="setView('sideBySide')">Side by Side</button>
+  <button class="toggle-btn" onclick="setView('before')">Before Only</button>
+  <button class="toggle-btn" onclick="setView('after')">After Only</button>
+</div>
+
+<div class="step-nav">
+  <button class="step-btn active" onclick="showStep(0)">שלב 1</button>
+  <button class="step-btn" onclick="showStep(1)">שלב 2</button>
+  <button class="step-btn" onclick="showStep(2)">שלב 3</button>
+  <button class="step-btn" onclick="showStep(3)">שלב 4</button>
+  <button class="step-btn" onclick="showStep(4)">שלב 5</button>
+</div>
+
+<div class="comparison" id="comparison">
+  <div class="column" id="col-before">
+    <div class="column-label before">CURRENT</div>
+    <div id="before-container"></div>
+  </div>
+  <div class="column" id="col-after">
+    <div class="column-label after">REDESIGN</div>
+    <div id="after-container"></div>
+  </div>
+</div>
+
+<script>
+// ============================
+// Step Definitions
+// ============================
+
+// --- Step 1: Employment ---
+const STEP1_OPTS = [
+  "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)",
+  "החלפת מקום עבודה",
+  "עבודה אצל יותר ממעסיק אחד באותה שנה",
+  "תקופה ללא עבודה / עבודה חלקית",
+  "לא זכור לי שינוי משמעותי",
+];
+const STEP1_NEGATION = "לא זכור לי שינוי משמעותי";
+const STEP1_ICONS = ["salary", "switch", "multi", "gap", "none"];
+const STEP1_WHY = "מס הכנסה מחשב מס לפי הנחת הכנסה חודשית אחידה לאורך השנה. שינויים בשכר או בתעסוקה עלולים ליצור פער בין המס שנוכה בפועל לבין המס הנדרש.";
+
+function step1Ack(sel) {
+  if (sel.length === 0) return null;
+  if (sel.includes(STEP1_NEGATION)) return "רשמנו שלא זכור שינוי משמעותי בתבנית ההעסקה.";
+  if (sel.length === 1) return "רשמנו שהיה שינוי בתבנית ההעסקה או השכר.";
+  return "רשמנו מספר שינויים בתבנית ההעסקה והשכר.";
+}
+
+function step1Exclusivity(current, toggled) {
+  if (current.includes(toggled)) return current.filter(s => s !== toggled);
+  if (toggled === STEP1_NEGATION) return [toggled];
+  return current.filter(s => s !== STEP1_NEGATION).concat(toggled);
+}
+
+// --- Step 2: Mortgage & Insurance ---
+// BEFORE: original 5 options (includes "both")
+const STEP2_BEFORE_OPTS = [
+  "משכנתא",
+  "ביטוח חיים פרטי (שאינו חלק ממשכנתא)",
+  "גם משכנתא וגם ביטוח חיים פרטי",
+  "לא היה לי אף אחד מאלה",
+  "לא בטוח",
+];
+// AFTER: clean 2x2 grid — "both" removed (multi-select handles it)
+const STEP2_AFTER_OPTS = [
+  "משכנתא",
+  "ביטוח חיים פרטי",
+  "לא היה לי",
+  "לא בטוח",
+];
+const STEP2_EXCLUSIVE = ["לא היה לי אף אחד מאלה", "לא בטוח", "לא היה לי"];
+const STEP2_BEFORE_ICONS = ["house", "shield", "both", "none", "question"];
+const STEP2_AFTER_ICONS = ["house", "shield", "none", "question"];
+const STEP2_WHY_DEFAULT = "במקרים כאלה קיימים לעיתים תשלומים שעשויים לזכות בהטבות מס, אך הם לא תמיד מנוצלים אוטומטית ודורשים בדיקה יזומה.";
+const STEP2_WHY_UNSURE = "זה בסדר אם אתה לא בטוח. בהמשך נבדוק את זה, ואם יהיה צורך נבקש אישור שנתי מתאים.";
+
+function step2AckBefore(sel) {
+  if (sel.length === 0) return null;
+  if (sel.includes("לא בטוח")) return "רשמנו שאין ודאות לגבי משכנתא או ביטוח חיים.";
+  if (sel.includes("לא היה לי אף אחד מאלה")) return "רשמנו שלא הייתה משכנתא או ביטוח חיים פרטי.";
+  if (sel.includes("גם משכנתא וגם ביטוח חיים פרטי")) return "רשמנו שהייתה גם משכנתא וגם ביטוח חיים פרטי.";
+  const m = sel.includes("משכנתא"), i = sel.includes("ביטוח חיים פרטי (שאינו חלק ממשכנתא)");
+  if (m && i) return "רשמנו שהייתה משכנתא וביטוח חיים פרטי באחת מהשנים.";
+  if (m) return "רשמנו שהייתה משכנתא באחת מהשנים.";
+  if (i) return "רשמנו שהיה ביטוח חיים פרטי באחת מהשנים.";
+  return null;
+}
+
+function step2AckAfter(sel) {
+  if (sel.length === 0) return null;
+  if (sel.includes("לא בטוח")) return "רשמנו שאין ודאות לגבי משכנתא או ביטוח חיים.";
+  if (sel.includes("לא היה לי")) return "רשמנו שלא הייתה משכנתא או ביטוח חיים פרטי.";
+  const m = sel.includes("משכנתא"), i = sel.includes("ביטוח חיים פרטי");
+  if (m && i) return "רשמנו שהייתה גם משכנתא וגם ביטוח חיים פרטי.";
+  if (m) return "רשמנו שהייתה משכנתא באחת מהשנים.";
+  if (i) return "רשמנו שהיה ביטוח חיים פרטי באחת מהשנים.";
+  return null;
+}
+
+function step2Why(sel) {
+  return sel.includes("לא בטוח") ? STEP2_WHY_UNSURE : STEP2_WHY_DEFAULT;
+}
+
+function step2BeforeExclusivity(current, toggled) {
+  if (current.includes(toggled)) return current.filter(s => s !== toggled);
+  if (["לא היה לי אף אחד מאלה", "לא בטוח"].includes(toggled)) return [toggled];
+  if (toggled === "גם משכנתא וגם ביטוח חיים פרטי") {
+    return current.filter(s => s !== "משכנתא" && s !== "ביטוח חיים פרטי (שאינו חלק ממשכנתא)" && !["לא היה לי אף אחד מאלה", "לא בטוח"].includes(s)).concat(toggled);
+  }
+  if (toggled === "משכנתא" || toggled === "ביטוח חיים פרטי (שאינו חלק ממשכנתא)") {
+    return current.filter(s => s !== "גם משכנתא וגם ביטוח חיים פרטי" && !["לא היה לי אף אחד מאלה", "לא בטוח"].includes(s)).concat(toggled);
+  }
+  return current.filter(s => !["לא היה לי אף אחד מאלה", "לא בטוח"].includes(s)).concat(toggled);
+}
+
+function step2AfterExclusivity(current, toggled) {
+  if (current.includes(toggled)) return current.filter(s => s !== toggled);
+  // "לא היה לי" and "לא בטוח" are exclusive with positive options
+  if (toggled === "לא היה לי" || toggled === "לא בטוח") return [toggled];
+  // Positive option clears exclusive options
+  return current.filter(s => s !== "לא היה לי" && s !== "לא בטוח").concat(toggled);
+}
+
+// --- Step 3: Personal Credits (BEFORE uses original 3 options, AFTER uses expanded 5) ---
+const STEP3_BEFORE_OPTS = [
+  "סיימתי תואר / לימודים אקדמיים",
+  "יש לי נקודות זיכוי אישיות (ילדים מתחת לגיל 18, מגבלה, עולה חדש וכד׳)",
+  "לא רלוונטי",
+];
+const STEP3_AFTER_OPTS = [
+  "סיום תואר / לימודים אקדמיים",
+  "ילדים מתחת לגיל 18",
+  "עולה חדש / תושב חוזר",
+  "מגבלה רפואית",
+  "לא רלוונטי",
+];
+const STEP3_NEGATION = "לא רלוונטי";
+const STEP3_BEFORE_ICONS = ["degree", "family", "none"];
+const STEP3_AFTER_ICONS = ["degree", "family", "plane", "access", "none"];
+const STEP3_WHY = "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.";
+
+function step3AckBefore(sel) {
+  if (sel.length === 0) return null;
+  if (sel.includes("לא רלוונטי")) return "רשמנו שאין הטבות או נקודות זיכוי ידועות.";
+  const d = sel.includes(STEP3_BEFORE_OPTS[0]), c = sel.includes(STEP3_BEFORE_OPTS[1]);
+  if (d && c) return "רשמנו שסיימת תואר ויש לך נקודות זיכוי אישיות.";
+  if (d) return "רשמנו שסיימת תואר או לימודים אקדמיים.";
+  if (c) return "רשמנו שיש לך נקודות זיכוי אישיות.";
+  return null;
+}
+
+function step3AckAfter(sel) {
+  if (sel.length === 0) return null;
+  if (sel.includes("לא רלוונטי")) return "רשמנו שאין הטבות או נקודות זיכוי ידועות.";
+  const parts = sel.filter(s => s !== "לא רלוונטי");
+  if (parts.length === 1) return `רשמנו: ${parts[0]}.`;
+  if (parts.length === 2) return `רשמנו: ${parts[0]} ו${parts[1]}.`;
+  return `רשמנו ${parts.length} נקודות זיכוי שייתכן שלא נוצלו.`;
+}
+
+function step3Exclusivity(current, toggled) {
+  if (current.includes(toggled)) return current.filter(s => s !== toggled);
+  if (toggled === STEP3_NEGATION) return [toggled];
+  return current.filter(s => s !== STEP3_NEGATION).concat(toggled);
+}
+
+// --- Step 4: Additional Income ---
+const STEP4_OPTS = [
+  "רווחים משוק ההון",
+  "הכנסה משכר דירה",
+  "הכנסה נוספת אחרת",
+  "לא היו לי הכנסות נוספות",
+];
+const STEP4_NEGATION = "לא היו לי הכנסות נוספות";
+const STEP4_ICONS = ["chart", "rental", "briefcase", "none"];
+const STEP4_WHY_HAS = "הכנסות נוספות משפיעות על חישוב המס הכולל ועשויות לדרוש דיווח נפרד, גם כאשר חלקן פטור ממס או ממוסה בשיעור קבוע.";
+const STEP4_WHY_NO = "גם כשההכנסה מגיעה רק ממשכורת, בדיקה מלאה של הנתונים יכולה לחשוף פערים בחישוב המס השנתי.";
+
+function step4Ack(sel) {
+  if (sel.length === 0) return null;
+  if (sel.includes(STEP4_NEGATION)) return "רשמנו שלא היו הכנסות נוספות מעבר לתלוש השכר.";
+  const parts = sel.filter(s => s !== STEP4_NEGATION);
+  if (parts.length === 1) return `רשמנו שהיו ${parts[0]}.`;
+  const last = parts.pop();
+  return `רשמנו שהיו ${parts.join(", ")} ו${last}.`;
+}
+
+function step4Why(sel) {
+  return sel.includes(STEP4_NEGATION) ? STEP4_WHY_NO : STEP4_WHY_HAS;
+}
+
+function step4Exclusivity(current, toggled) {
+  if (current.includes(toggled)) return current.filter(s => s !== toggled);
+  if (toggled === STEP4_NEGATION) return [toggled];
+  return current.filter(s => s !== STEP4_NEGATION).concat(toggled);
+}
+
+// --- Step 5: Tax Years ---
+const STEP5_YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+const STEP5_HELPER = "כל שנה נבדקת בנפרד על-פי הנתונים הרלוונטיים לאותה שנה.<br>ניתן לבדוק רק שנות מס שהסתיימו — כולל שנת 2025.<br>תוצאות הבדיקה עשויות להיות שונות משנה לשנה.";
+
+function step5Toggle(current, year) {
+  if (current.includes(year)) return current.filter(y => y !== year);
+  return [...current, year].sort();
+}
+
+// ============================
+// State
+// ============================
+const STEP_TITLES = [
+  "שינוי בתבנית ההעסקה או השכר",
+  "משכנתא וביטוח חיים",
+  "נקודות זיכוי והטבות אישיות",
+  "הכנסות נוספות מעבר לתלוש השכר",
+  "בחירת שנות הבדיקה",
+];
+
+const STEP_QUESTIONS = [
+  "האם במהלך שש השנים האחרונות היה שינוי בתבנית ההעסקה או השכר שלך?",
+  "האם באחת מהשנים היה לך אחד מהדברים הבאים?",
+  "האם יש לך נקודות זיכוי או הטבות אישיות שייתכן שלא נוצלו?",
+  "האם היו לך הכנסות נוספות מעבר לתלוש השכר?",
+  "לאילו שנים תרצה לבדוק?",
+];
+
+// Separate selection state for before/after so they work independently
+let state = {
+  before: [[], [], [], [], []],
+  after:  [[], [], [], [], []],
+};
+
+let currentStepIndex = 0;
+let currentView = 'sideBySide';
+
+// SVG Icons
+const ICONS = {
+  salary: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  switch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h13M9 3l6 6-6 6"/><path d="M21 15H8M15 21l-6-6 6-6"/></svg>',
+  multi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="7" height="18" rx="1"/><rect x="15" y="3" width="7" height="18" rx="1"/><path d="M9 12h6"/></svg>',
+  gap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4M16 2v4"/><path d="M10 16l2 2 4-4" opacity="0.4"/></svg>',
+  none: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>',
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><path d="M9 21v-6h6v6"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>',
+  both: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l6-6 3 3"/><path d="M5 10v8a1 1 0 001 1h5"/><path d="M15 22s5-3 5-7v-4l-5-2-5 2v4c0 4 5 7 5 7z"/></svg>',
+  question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+  degree: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-5-10 5 10 5 10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/><path d="M22 10v6"/></svg>',
+  family: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="10" r="2"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M21 21v-1a3 3 0 00-3-3h-1"/></svg>',
+  plane: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+  access: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.5"/><path d="M12 7v6"/><path d="M8 13l4 4 4-4"/><path d="M7 20h10"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  rental: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><circle cx="12" cy="15" r="2"/><path d="M12 13v-2"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M12 12v2"/></svg>',
+};
+
+const CHECKMARK_SVG = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+// ============================
+// Toggle handlers
+// ============================
+function toggleBefore(stepIdx, option) {
+  const sel = state.before[stepIdx];
+  switch (stepIdx) {
+    case 0: state.before[0] = step1Exclusivity(sel, option); break;
+    case 1: state.before[1] = step2BeforeExclusivity(sel, option); break;
+    case 2: state.before[2] = step3Exclusivity(sel, option); break;
+    case 3: state.before[3] = step4Exclusivity(sel, option); break;
+    case 4: state.before[4] = step5Toggle(sel, option); break;
+  }
+  render();
+}
+
+function toggleAfter(stepIdx, option) {
+  const sel = state.after[stepIdx];
+  switch (stepIdx) {
+    case 0: state.after[0] = step1Exclusivity(sel, option); break;
+    case 1: state.after[1] = step2AfterExclusivity(sel, option); break;
+    case 2: state.after[2] = step3Exclusivity(sel, option); break;
+    case 3: state.after[3] = step4Exclusivity(sel, option); break;
+    case 4: state.after[4] = step5Toggle(sel, option); break;
+  }
+  render();
+}
+
+// ============================
+// Get dynamic ack/why for a step
+// ============================
+function getAck(stepIdx, sel, isAfter) {
+  switch (stepIdx) {
+    case 0: return step1Ack(sel);
+    case 1: return isAfter ? step2AckAfter(sel) : step2AckBefore(sel);
+    case 2: return isAfter ? step3AckAfter(sel) : step3AckBefore(sel);
+    case 3: return step4Ack(sel);
+    default: return null;
+  }
+}
+
+function getWhy(stepIdx, sel) {
+  switch (stepIdx) {
+    case 0: return STEP1_WHY;
+    case 1: return step2Why(sel);
+    case 2: return STEP3_WHY;
+    case 3: return step4Why(sel);
+    default: return null;
+  }
+}
+
+function getWhyVisible(stepIdx, sel) {
+  switch (stepIdx) {
+    case 0: return true; // always visible
+    case 1: return sel.length > 0;
+    case 2: return sel.length > 0;
+    case 3: return sel.length > 0;
+    default: return false;
+  }
+}
+
+// ============================
+// Render BEFORE
+// ============================
+function renderBefore(stepIdx) {
+  const sel = state.before[stepIdx];
+  const isYears = stepIdx === 4;
+
+  let html = '<div class="current-wizard">';
+
+  // Progress dots
+  html += '<div class="current-progress">';
+  for (let i = 0; i < 5; i++) {
+    const cls = i === stepIdx ? 'active' : (i < stepIdx ? 'completed' : '');
+    html += `<div class="current-dot ${cls}"></div>`;
+  }
+  html += '</div>';
+
+  html += `<div class="current-step-label">שלב ${stepIdx + 1} מתוך 5 — ${STEP_TITLES[stepIdx]}</div>`;
+
+  html += '<div class="current-step">';
+  html += `<h2 class="current-question">${STEP_QUESTIONS[stepIdx]}</h2>`;
+  html += '<div class="current-options">';
+
+  if (isYears) {
+    STEP5_YEARS.forEach(year => {
+      const selected = sel.includes(year);
+      html += `
+        <div class="current-option ${selected ? 'selected' : ''}" onclick="toggleBefore(4, ${year})">
+          <span class="current-indicator">
+            ${selected ? `<svg class="current-checkmark" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+          </span>
+          <span class="current-option-label">${year}</span>
+        </div>`;
+    });
+  } else {
+    const opts = stepIdx === 0 ? STEP1_OPTS :
+                 stepIdx === 1 ? STEP2_BEFORE_OPTS :
+                 stepIdx === 2 ? STEP3_BEFORE_OPTS : STEP4_OPTS;
+    opts.forEach(opt => {
+      const selected = sel.includes(opt);
+      const escaped = opt.replace(/'/g, "\\'");
+      html += `
+        <div class="current-option ${selected ? 'selected' : ''}" onclick="toggleBefore(${stepIdx}, '${escaped}')">
+          <span class="current-indicator">
+            ${selected ? `<svg class="current-checkmark" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''}
+          </span>
+          <span class="current-option-label">${opt}</span>
+        </div>`;
+    });
+  }
+
+  html += '</div>';
+
+  // Ack
+  const ack = getAck(stepIdx, sel, false);
+  if (ack) html += `<p class="current-helper">${ack}</p>`;
+
+  // Why
+  const why = getWhy(stepIdx, sel);
+  if (why && getWhyVisible(stepIdx, sel)) {
+    html += `<div class="current-why"><div class="current-why-label">למה זה חשוב?</div><div class="current-why-text">${why}</div></div>`;
+  }
+
+  // Helper for years
+  if (isYears) {
+    html += `<p class="current-helper">${STEP5_HELPER}</p>`;
+  }
+
+  html += '</div>';
+
+  // CTA
+  const valid = sel.length > 0;
+  html += '<div class="current-cta-bar">';
+  html += `<button class="current-cta-primary ${valid ? '' : 'disabled'}">${stepIdx === 4 ? 'סיום' : 'המשך'}</button>`;
+  if (stepIdx > 0) html += '<button class="current-cta-secondary">חזרה</button>';
+  html += '</div>';
+  if (!valid) html += '<p class="current-disabled-hint">יש לבחור לפחות אפשרות אחת כדי להמשיך</p>';
+
+  html += '</div>';
+  return html;
+}
+
+// ============================
+// Render AFTER
+// ============================
+function renderAfter(stepIdx) {
+  const sel = state.after[stepIdx];
+  const isYears = stepIdx === 4;
+
+  let html = '<div class="new-wizard">';
+
+  // Progress bar
+  html += '<div class="new-progress-container"><div class="new-progress">';
+  for (let i = 0; i < 5; i++) {
+    const cls = i === stepIdx ? 'active' : (i < stepIdx ? 'completed' : '');
+    html += `<div class="new-segment ${cls}"></div>`;
+  }
+  html += `</div><div class="new-step-label">${STEP_TITLES[stepIdx]} <span class="new-step-counter">(${stepIdx + 1}/5)</span></div></div>`;
+
+  // Card
+  html += '<div class="new-card"><div class="new-step">';
+  html += `<h2 class="new-question">${STEP_QUESTIONS[stepIdx]}</h2>`;
+
+  if (isYears) {
+    // Year pills
+    html += '<div class="new-options pills">';
+    STEP5_YEARS.forEach(year => {
+      const selected = sel.includes(year);
+      html += `<div class="new-pill ${selected ? 'selected' : ''}" onclick="toggleAfter(4, ${year})">${year}</div>`;
+    });
+    html += '</div>';
+
+    // Selected years summary
+    if (sel.length > 0) {
+      const sorted = [...sel].sort();
+      html += `<div class="new-years-summary">נבחרו ${sel.length} שנים: ${sorted.join(', ')}</div>`;
+    }
+
+    html += `<p class="new-helper">${STEP5_HELPER}</p>`;
+  } else {
+    const opts = stepIdx === 0 ? STEP1_OPTS :
+                 stepIdx === 1 ? STEP2_AFTER_OPTS :
+                 stepIdx === 2 ? STEP3_AFTER_OPTS : STEP4_OPTS;
+    const icons = stepIdx === 0 ? STEP1_ICONS :
+                  stepIdx === 1 ? STEP2_AFTER_ICONS :
+                  stepIdx === 2 ? STEP3_AFTER_ICONS : STEP4_ICONS;
+
+    // Step 2: all 4 tiles are equal (2x2 grid, no negation bars)
+    const negations = stepIdx === 0 ? [STEP1_NEGATION] :
+                      stepIdx === 1 ? [] :
+                      stepIdx === 2 ? [STEP3_NEGATION] : [STEP4_NEGATION];
+
+    const positiveOpts = opts.filter(o => !negations.includes(o));
+    const negationOpts = opts.filter(o => negations.includes(o));
+
+    html += '<div class="new-options">';
+
+    positiveOpts.forEach(opt => {
+      const origIdx = opts.indexOf(opt);
+      const selected = sel.includes(opt);
+      const escaped = opt.replace(/'/g, "\\'");
+      html += `
+        <div class="new-option ${selected ? 'selected' : ''}" onclick="toggleAfter(${stepIdx}, '${escaped}')">
+          <span class="new-option-icon">${ICONS[icons[origIdx]] || ''}</span>
+          <span class="new-option-label">${opt}</span>
+          ${selected ? `<span class="new-selected-badge">${CHECKMARK_SVG}</span>` : ''}
+        </div>`;
+    });
+
+    negationOpts.forEach(opt => {
+      const origIdx = opts.indexOf(opt);
+      const selected = sel.includes(opt);
+      const escaped = opt.replace(/'/g, "\\'");
+      html += `
+        <div class="new-option negation ${selected ? 'selected' : ''}" onclick="toggleAfter(${stepIdx}, '${escaped}')">
+          <span class="new-option-icon">${ICONS[icons[origIdx]] || ''}</span>
+          <span class="new-option-label">${opt}</span>
+        </div>`;
+    });
+
+    html += '</div>';
+
+    // Ack
+    const ack = getAck(stepIdx, sel, true);
+    if (ack) {
+      html += `<div class="new-ack">
+        <svg class="new-ack-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+        <span>${ack}</span>
+      </div>`;
+    }
+
+    // Why
+    const why = getWhy(stepIdx, sel);
+    if (why && getWhyVisible(stepIdx, sel)) {
+      html += `<div class="new-why"><div class="new-why-label">למה זה חשוב?</div><div class="new-why-text">${why}</div></div>`;
+    }
+  }
+
+  html += '</div></div>';
+
+  // CTA
+  const valid = sel.length > 0;
+  html += '<div class="new-cta-bar">';
+  html += `<button class="new-cta-primary ${valid ? '' : 'disabled'}">${stepIdx === 4 ? 'סיום' : 'המשך'}</button>`;
+  if (stepIdx > 0) html += '<button class="new-cta-secondary">חזרה</button>';
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+// ============================
+// Navigation
+// ============================
+function showStep(idx) {
+  currentStepIndex = idx;
+  document.querySelectorAll('.step-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+  render();
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const comp = document.getElementById('comparison');
+  const before = document.getElementById('col-before');
+  const after = document.getElementById('col-after');
+
+  comp.classList.remove('single');
+  before.classList.remove('hidden');
+  after.classList.remove('hidden');
+
+  if (view === 'before') {
+    after.classList.add('hidden');
+    comp.classList.add('single');
+  } else if (view === 'after') {
+    before.classList.add('hidden');
+    comp.classList.add('single');
+  }
+}
+
+function render() {
+  document.getElementById('before-container').innerHTML = renderBefore(currentStepIndex);
+  document.getElementById('after-container').innerHTML = renderAfter(currentStepIndex);
+}
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>

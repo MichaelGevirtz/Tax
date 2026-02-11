@@ -1,24 +1,130 @@
 .step {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .question {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.35;
   color: var(--color-text);
+  text-align: center;
+  letter-spacing: -0.01em;
 }
 
+.questionSub {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-block-start: var(--space-sm);
+}
+
+/* Single-column options list */
 .options {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
+/* "או" separator */
+.separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin: var(--space-xs) 0;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* Feedback area (ack + why) */
+.feedback {
+  margin-block-start: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Acknowledgment line — inline with icon, no background */
+.ack {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: 500;
+  animation: fadeIn 200ms ease-out;
+  min-height: 24px;
+}
+
+.ackIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Year pills — 3-column grid */
+.pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+/* Year summary */
+.yearsSummary {
+  text-align: center;
+  font-size: var(--font-size-body);
+  color: var(--color-primary);
+  font-weight: 600;
+  min-height: 28px;
+  margin-block-start: var(--space-md);
+}
+
 .helper {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--line-height-body);
+  text-align: center;
+  margin-block-start: var(--space-sm);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 639px) {
+  .question {
+    font-size: 22px;
+  }
+
+  .pills {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 350px) {
+  .question {
+    font-size: 20px;
+  }
+
+  .pills {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ack {
+    animation: none;
+  }
 }

@@ -1,22 +1,10 @@
 .container {
-  background: var(--color-primary-light);
-  border-radius: var(--radius-sm);
-  padding: var(--space-lg);
-  margin-block-start: var(--space-md);
-  animation: fadeIn 300ms ease-out;
-}
-
-.label {
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  margin-block-end: var(--space-xs);
-}
-
-.text {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   line-height: var(--line-height-body);
+  padding-inline-start: var(--space-lg);
+  border-inline-start: 2px solid var(--color-border);
+  animation: fadeIn 200ms ease-out;
 }
 
 @keyframes fadeIn {

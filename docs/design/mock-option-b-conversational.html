@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Option B — Conversational Flow — Wizard Redesign</title>
+<style>
+/* ============================
+   Design Tokens (from globals.css)
+   ============================ */
+:root {
+  --color-bg: #FAFAF8;
+  --color-bg-white: #FFFFFF;
+  --color-bg-alt: #EDEAE6;
+  --color-text: #2D2A26;
+  --color-text-secondary: #6B6560;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #EFF6FF;
+  --color-primary-subtle: #C9DDFB;
+  --color-border: #D5D0CA;
+  --color-success: #16A34A;
+  --color-success-light: #F0FDF4;
+  --color-warning: #EA580C;
+  --color-error: #E11D48;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --font-size-body: 17px;
+  --font-size-sm: 14px;
+  --font-size-xs: 13px;
+  --line-height-body: 1.6;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-bg-white);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================
+   Mock Navigation (dev only)
+   ============================ */
+.mock-header {
+  background: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-lg);
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.mock-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-sm);
+}
+
+.mock-header p {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.step-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 65px;
+  z-index: 99;
+  flex-wrap: wrap;
+}
+
+.step-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-white);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  transition: all 200ms ease-out;
+}
+
+.step-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ============================
+   Wizard Container
+   ============================ */
+.wizard-page {
+  min-height: calc(100vh - 130px);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-white);
+}
+
+.wizard-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 580px;
+  width: 100%;
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg);
+  animation: fadeIn 250ms ease-out;
+}
+
+/* --- Floating step indicator --- */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-block-end: var(--space-2xl);
+}
+
+.step-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all 300ms ease-out;
+}
+
+.step-dot.active {
+  width: 28px;
+  border-radius: 4px;
+  background: var(--color-primary);
+}
+
+.step-dot.completed {
+  background: var(--color-primary);
+  opacity: 0.5;
+}
+
+.step-fraction {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-inline-start: var(--space-sm);
+}
+
+/* --- Question (hero) --- */
+.question-block {
+  text-align: center;
+  margin-block-end: var(--space-xl);
+}
+
+.question {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.question-sub {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-block-start: var(--space-sm);
+}
+
+/* --- Option cards (horizontal, single column) --- */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 200ms ease-out, background 200ms ease-out, box-shadow 200ms ease-out;
+  user-select: none;
+  min-height: 60px;
+  position: relative;
+}
+
+.option-card:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* SELECTED: strong left border accent + subtle bg */
+.option-card.selected {
+  border-color: var(--color-primary);
+  border-inline-start-width: 4px;
+  background: var(--color-primary-subtle);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.option-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-alt);
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  transition: background 200ms ease-out, color 200ms ease-out;
+}
+
+.option-card.selected .option-icon {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.option-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.option-text {
+  flex: 1;
+  font-size: var(--font-size-body);
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.option-card.selected .option-text {
+  font-weight: 600;
+}
+
+.option-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 200ms ease-out;
+}
+
+.option-card.selected .option-check {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.option-check svg {
+  width: 12px;
+  height: 12px;
+  color: #fff;
+}
+
+/* --- Negation (muted option at bottom) --- */
+.option-card.negation-card {
+  background: var(--color-bg-alt);
+  border-color: transparent;
+  min-height: 52px;
+}
+
+.option-card.negation-card:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+}
+
+.option-card.negation-card.selected {
+  border-color: var(--color-text-secondary);
+  border-inline-start-width: 4px;
+  background: var(--color-bg-alt);
+  box-shadow: none;
+}
+
+.option-card.negation-card .option-icon {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+}
+
+.option-card.negation-card .option-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.option-card.negation-card.selected .option-text {
+  color: var(--color-text);
+}
+
+.option-card.negation-card .option-check {
+  width: 20px;
+  height: 20px;
+}
+
+.option-card.negation-card.selected .option-icon {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.option-card.negation-card.selected .option-check {
+  border-color: var(--color-text-secondary);
+  background: var(--color-text-secondary);
+}
+
+/* --- Separator before negation --- */
+.options-separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin: var(--space-xs) 0;
+}
+
+.options-separator::before,
+.options-separator::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* --- Year pills --- */
+.pills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 16px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  transition: border-color 200ms ease-out, background 200ms ease-out, color 200ms ease-out, box-shadow 200ms ease-out;
+  user-select: none;
+}
+
+.pill:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.pill.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --- Feedback area (ack + why) --- */
+.feedback {
+  margin-block-start: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.ack-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: 500;
+  animation: fadeIn 200ms ease-out;
+  min-height: 24px;
+}
+
+.ack-line svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.why-line {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+  padding-inline-start: var(--space-lg);
+  border-inline-start: 2px solid var(--color-border);
+  animation: fadeIn 200ms ease-out;
+}
+
+.years-summary {
+  text-align: center;
+  font-size: var(--font-size-body);
+  color: var(--color-primary);
+  font-weight: 600;
+  min-height: 28px;
+  margin-block-start: var(--space-md);
+}
+
+.helper {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body);
+  text-align: center;
+  margin-block-start: var(--space-sm);
+}
+
+/* ============================
+   Bottom CTA (always at bottom)
+   ============================ */
+.cta-area {
+  margin-block-start: auto;
+  padding-block-start: var(--space-xl);
+}
+
+.cta-bar {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-md) 0;
+}
+
+.cta-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 16px 56px;
+  border-radius: var(--radius-pill);
+  font-size: 17px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  min-width: 200px;
+  transition: background 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out;
+}
+
+.cta-primary:hover:not(.disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+
+.cta-primary.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.cta-secondary {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+  padding: 16px 24px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 200ms ease-out;
+}
+
+.cta-secondary:hover {
+  color: var(--color-primary);
+}
+
+.disabled-hint {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-block-start: var(--space-sm);
+}
+
+/* --- Trust footer --- */
+.trust-footer {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0 var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.trust-footer span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trust-footer svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* GEO: micro-explainer for users arriving via AI citation */
+.geo-explainer {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-block-end: var(--space-lg);
+}
+
+/* GEO: freshness date */
+.freshness-date {
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  margin-block-start: var(--space-xs);
+}
+
+/* ============================
+   Animations
+   ============================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard-body, .ack-line, .why-line {
+    animation: none;
+  }
+  .cta-primary:hover:not(.disabled) {
+    transform: none;
+  }
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 639px) {
+  .wizard-body {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .question {
+    font-size: 22px;
+  }
+
+  .pills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pill {
+    padding: 16px 12px;
+    font-size: 18px;
+  }
+
+  .cta-area {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg-white);
+    padding: var(--space-md);
+    margin-inline: calc(-1 * var(--space-md));
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+    z-index: 10;
+  }
+
+  .cta-primary {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trust-footer {
+    display: none;
+  }
+
+  .option-card {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .option-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .option-text {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 350px) {
+  .question {
+    font-size: 20px;
+  }
+
+  .pills-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="mock-header">
+  <h1>Option B — Conversational Flow</h1>
+  <p>Bolder redesign: single-column cards, question-as-hero, floating dots, pill CTA, trust footer, max breathing room</p>
+</div>
+
+<div class="step-nav">
+  <button class="step-btn active" onclick="showStep(0)">שלב 1</button>
+  <button class="step-btn" onclick="showStep(1)">שלב 2</button>
+  <button class="step-btn" onclick="showStep(2)">שלב 3</button>
+  <button class="step-btn" onclick="showStep(3)">שלב 4</button>
+  <button class="step-btn" onclick="showStep(4)">שלב 5</button>
+</div>
+
+<div id="wizard-root"></div>
+
+<script>
+// ============================
+// Data — same content, no text changes
+// ============================
+const STEP_TITLES = [
+  "שינוי בתבנית ההעסקה או השכר",
+  "משכנתא וביטוח חיים",
+  "נקודות זיכוי והטבות אישיות",
+  "הכנסות נוספות מעבר לתלוש השכר",
+  "בחירת שנות הבדיקה",
+];
+
+const STEP_QUESTIONS = [
+  "האם במהלך שש השנים האחרונות היה שינוי בתבנית ההעסקה או השכר שלך?",
+  "האם באחת מהשנים היה לך אחד מהדברים הבאים?",
+  "האם יש לך נקודות זיכוי או הטבות אישיות שייתכן שלא נוצלו?",
+  "האם היו לך הכנסות נוספות מעבר לתלוש השכר?",
+  "לאילו שנים תרצה לבדוק?",
+];
+
+const ICONS = {
+  salary: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  switch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h13M9 3l6 6-6 6"/><path d="M21 15H8M15 21l-6-6 6-6"/></svg>',
+  multi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="7" height="18" rx="1"/><rect x="15" y="3" width="7" height="18" rx="1"/><path d="M9 12h6"/></svg>',
+  gap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="M8 2v4M16 2v4"/><path d="M10 16l2 2 4-4" opacity="0.4"/></svg>',
+  none: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>',
+  house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><path d="M9 21v-6h6v6"/></svg>',
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>',
+  question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+  degree: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10l-10-5-10 5 10 5 10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/><path d="M22 10v6"/></svg>',
+  family: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="10" r="2"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M21 21v-1a3 3 0 00-3-3h-1"/></svg>',
+  plane: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+  access: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2.5"/><path d="M12 7v6"/><path d="M8 13l4 4 4-4"/><path d="M7 20h10"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+  rental: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/><circle cx="12" cy="15" r="2"/><path d="M12 13v-2"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M12 12v2"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+};
+
+const CHECKMARK = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ACK_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>';
+
+// Step 1
+const S1_OPTS = [
+  { label: "שינוי בשכר במהלך השנה (עלייה / ירידה / בונוסים)", icon: "salary" },
+  { label: "החלפת מקום עבודה", icon: "switch" },
+  { label: "עבודה אצל יותר ממעסיק אחד באותה שנה", icon: "multi" },
+  { label: "תקופה ללא עבודה / עבודה חלקית", icon: "gap" },
+];
+const S1_NEG = "לא זכור לי שינוי משמעותי";
+const S1_WHY = "מס הכנסה מחשב מס לפי הנחת הכנסה חודשית אחידה לאורך השנה. שינויים בשכר או בתעסוקה עלולים ליצור פער בין המס שנוכה בפועל לבין המס הנדרש.";
+
+function s1Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (t === S1_NEG) return [t];
+  return cur.filter(s => s !== S1_NEG).concat(t);
+}
+function s1Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes(S1_NEG)) return "רשמנו שלא זכור שינוי משמעותי בתבנית ההעסקה.";
+  return sel.length === 1 ? "רשמנו שהיה שינוי בתבנית ההעסקה או השכר." : "רשמנו מספר שינויים בתבנית ההעסקה והשכר.";
+}
+
+// Step 2
+const S2_OPTS = [
+  { label: "משכנתא", icon: "house" },
+  { label: "ביטוח חיים פרטי", icon: "shield" },
+  { label: "לא היה לי", icon: "none" },
+  { label: "לא בטוח", icon: "question" },
+];
+const S2_EXCL = ["לא היה לי", "לא בטוח"];
+const S2_WHY = "במקרים כאלה קיימים לעיתים תשלומים שעשויים לזכות בהטבות מס, אך הם לא תמיד מנוצלים אוטומטית ודורשים בדיקה יזומה.";
+const S2_WHY_UNSURE = "זה בסדר אם אתה לא בטוח. בהמשך נבדוק את זה, ואם יהיה צורך נבקש אישור שנתי מתאים.";
+
+function s2Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (S2_EXCL.includes(t)) return [t];
+  return cur.filter(s => !S2_EXCL.includes(s)).concat(t);
+}
+function s2Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes("לא בטוח")) return "רשמנו שאין ודאות לגבי משכנתא או ביטוח חיים.";
+  if (sel.includes("לא היה לי")) return "רשמנו שלא הייתה משכנתא או ביטוח חיים פרטי.";
+  const m = sel.includes("משכנתא"), i = sel.includes("ביטוח חיים פרטי");
+  if (m && i) return "רשמנו שהייתה גם משכנתא וגם ביטוח חיים פרטי.";
+  if (m) return "רשמנו שהייתה משכנתא באחת מהשנים.";
+  if (i) return "רשמנו שהיה ביטוח חיים פרטי באחת מהשנים.";
+  return null;
+}
+
+// Step 3
+const S3_OPTS = [
+  { label: "סיום תואר / לימודים אקדמיים", icon: "degree" },
+  { label: "ילדים מתחת לגיל 18", icon: "family" },
+  { label: "עולה חדש / תושב חוזר", icon: "plane" },
+  { label: "מגבלה רפואית", icon: "access" },
+];
+const S3_NEG = "לא רלוונטי";
+const S3_WHY = "נקודות זיכוי והטבות אישיות אינן תמיד מחושבות במלואן דרך המעסיק.";
+
+function s3Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (t === S3_NEG) return [t];
+  return cur.filter(s => s !== S3_NEG).concat(t);
+}
+function s3Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes(S3_NEG)) return "רשמנו שאין הטבות או נקודות זיכוי ידועות.";
+  const parts = sel.filter(s => s !== S3_NEG);
+  if (parts.length === 1) return `רשמנו: ${parts[0]}.`;
+  if (parts.length === 2) return `רשמנו: ${parts[0]} ו${parts[1]}.`;
+  return `רשמנו ${parts.length} נקודות זיכוי שייתכן שלא נוצלו.`;
+}
+
+// Step 4
+const S4_OPTS = [
+  { label: "רווחים משוק ההון", icon: "chart" },
+  { label: "הכנסה משכר דירה", icon: "rental" },
+  { label: "הכנסה נוספת אחרת", icon: "briefcase" },
+];
+const S4_NEG = "לא היו לי הכנסות נוספות";
+const S4_WHY_HAS = "הכנסות נוספות משפיעות על חישוב המס הכולל ועשויות לדרוש דיווח נפרד, גם כאשר חלקן פטור ממס או ממוסה בשיעור קבוע.";
+const S4_WHY_NO = "גם כשההכנסה מגיעה רק ממשכורת, בדיקה מלאה של הנתונים יכולה לחשוף פערים בחישוב המס השנתי.";
+
+function s4Excl(cur, t) {
+  if (cur.includes(t)) return cur.filter(s => s !== t);
+  if (t === S4_NEG) return [t];
+  return cur.filter(s => s !== S4_NEG).concat(t);
+}
+function s4Ack(sel) {
+  if (!sel.length) return null;
+  if (sel.includes(S4_NEG)) return "רשמנו שלא היו הכנסות נוספות מעבר לתלוש השכר.";
+  const parts = sel.filter(s => s !== S4_NEG);
+  if (parts.length === 1) return `רשמנו שהיו ${parts[0]}.`;
+  const last = parts.pop();
+  return `רשמנו שהיו ${parts.join(", ")} ו${last}.`;
+}
+
+// Step 5
+const YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
+const S5_HELPER = "כל שנה נבדקת בנפרד על-פי הנתונים הרלוונטיים לאותה שנה.<br>ניתן לבדוק רק שנות מס שהסתיימו — כולל שנת 2025.";
+
+// ============================
+// State
+// ============================
+let selections = [[], [], [], [], []];
+let currentStep = 0;
+
+function toggle(stepIdx, option) {
+  const sel = selections[stepIdx];
+  switch (stepIdx) {
+    case 0: selections[0] = s1Excl(sel, option); break;
+    case 1: selections[1] = s2Excl(sel, option); break;
+    case 2: selections[2] = s3Excl(sel, option); break;
+    case 3: selections[3] = s4Excl(sel, option); break;
+    case 4:
+      if (sel.includes(option)) selections[4] = sel.filter(y => y !== option);
+      else selections[4] = [...sel, option].sort();
+      break;
+  }
+  render();
+}
+
+function showStep(idx) {
+  currentStep = idx;
+  document.querySelectorAll('.step-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+  render();
+}
+
+// ============================
+// Render helpers
+// ============================
+function renderOptionCard(stepIdx, label, icon, isNegation) {
+  const sel = selections[stepIdx];
+  const selected = sel.includes(label);
+  const esc = label.replace(/'/g, "\\'");
+  const negCls = isNegation ? 'negation-card' : '';
+  const selCls = selected ? 'selected' : '';
+
+  return `
+    <div class="option-card ${negCls} ${selCls}" onclick="toggle(${stepIdx}, '${esc}')">
+      <span class="option-icon">${ICONS[icon]}</span>
+      <span class="option-text">${label}</span>
+      <span class="option-check">${selected ? CHECKMARK : ''}</span>
+    </div>`;
+}
+
+function renderFeedback(stepIdx) {
+  const sel = selections[stepIdx];
+  if (sel.length === 0) return '';
+
+  const ackFns = [s1Ack, s2Ack, s3Ack, s4Ack];
+  const ack = ackFns[stepIdx](sel);
+
+  const whyTexts = [
+    S1_WHY,
+    sel.includes("לא בטוח") ? S2_WHY_UNSURE : S2_WHY,
+    S3_WHY,
+    sel.includes(S4_NEG) ? S4_WHY_NO : S4_WHY_HAS,
+  ];
+
+  let html = '<div class="feedback">';
+  if (ack) {
+    html += `<div class="ack-line">${ACK_CHECK}<span>${ack}</span></div>`;
+  }
+  html += `<div class="why-line">${whyTexts[stepIdx]}</div>`;
+  html += '</div>';
+  return html;
+}
+
+// ============================
+// Main render
+// ============================
+function render() {
+  const s = currentStep;
+  const sel = selections[s];
+  const valid = sel.length > 0;
+
+  let html = '<div class="wizard-page"><div class="wizard-body">';
+
+  // -- Step indicator (dots) --
+  html += '<div class="step-indicator"><div class="step-dots">';
+  for (let i = 0; i < 5; i++) {
+    const cls = i < s ? 'completed' : (i === s ? 'active' : '');
+    html += `<div class="step-dot ${cls}"></div>`;
+  }
+  html += '</div>';
+  html += `<span class="step-fraction">${s + 1}/5</span>`;
+  html += '</div>';
+  html += '<div class="freshness-date">נכון לפברואר 2026</div>';
+
+  // -- Question (hero) --
+  html += '<div class="question-block">';
+  html += `<h2 class="question">${STEP_QUESTIONS[s]}</h2>`;
+  if (s === 0) {
+    html += `<p class="question-sub">(ניתן לבחור יותר מתשובה אחת)</p>`;
+  }
+  html += '</div>';
+
+  // GEO: micro-explainer on Step 1 for users arriving via AI recommendation
+  if (s === 0) {
+    html += '<div class="geo-explainer">בדיקת זכאות חינמית להחזר מס · תוצאה תוך 2 דקות · ללא מסירת פרטים אישיים</div>';
+  }
+
+  // -- Options --
+  if (s < 4) {
+    const allOpts = [S1_OPTS, S2_OPTS, S3_OPTS, S4_OPTS][s];
+    const neg = [S1_NEG, null, S3_NEG, S4_NEG][s];
+
+    html += '<div class="options-list">';
+
+    if (s === 1) {
+      // Step 2: first 2 are positive, last 2 are dismissive — separate with divider
+      allOpts.slice(0, 2).forEach(opt => {
+        html += renderOptionCard(s, opt.label, opt.icon, false);
+      });
+      html += '<div class="options-separator">או</div>';
+      allOpts.slice(2).forEach(opt => {
+        html += renderOptionCard(s, opt.label, opt.icon, true);
+      });
+    } else {
+      allOpts.forEach(opt => {
+        html += renderOptionCard(s, opt.label, opt.icon, false);
+      });
+      if (neg) {
+        html += '<div class="options-separator">או</div>';
+        html += renderOptionCard(s, neg, "none", true);
+      }
+    }
+
+    html += '</div>';
+
+    // Feedback (ack + why)
+    html += renderFeedback(s);
+
+  } else {
+    // Step 5 — year pills
+    html += '<div class="pills-grid">';
+    YEARS.forEach(year => {
+      const selected = sel.includes(year);
+      html += `<div class="pill ${selected ? 'selected' : ''}" onclick="toggle(4, ${year})">${year}</div>`;
+    });
+    html += '</div>';
+
+    if (sel.length > 0) {
+      const sorted = [...sel].sort();
+      html += `<div class="years-summary">נבחרו ${sel.length} שנים: ${sorted.join(', ')}</div>`;
+    } else {
+      html += '<div class="years-summary"></div>';
+    }
+
+    html += `<p class="helper">${S5_HELPER}</p>`;
+  }
+
+  // -- CTA area (pushed to bottom) --
+  html += '<div class="cta-area">';
+  html += '<div class="cta-bar">';
+  if (s > 0) html += '<button class="cta-secondary">חזרה</button>';
+  html += `<button class="cta-primary ${valid ? '' : 'disabled'}">${s === 4 ? 'סיום' : 'המשך'}</button>`;
+  html += '</div>';
+  if (!valid) html += '<p class="disabled-hint">יש לבחור לפחות אפשרות אחת כדי להמשיך</p>';
+
+  // Trust footer on first step
+  if (s === 0) {
+    html += '<div class="trust-footer">';
+    html += `<span>${ICONS.clock} כ-2 דקות</span>`;
+    html += `<span>${ICONS.lock} ללא רישום</span>`;
+    html += `<span>${ICONS.check} בדיקה חינמית</span>`;
+    html += '</div>';
+  }
+
+  html += '</div>';
+
+  html += '</div></div>';
+
+  document.getElementById('wizard-root').innerHTML = html;
+}
+
+// Initial render
+render();
+</script>
+
+</body>
+</html>
