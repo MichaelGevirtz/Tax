@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tax/adapters": "file:../../packages/adapters",
+    "@tax/core": "file:../../packages/core",
     "@tax/ingestion": "file:../../packages/ingestion",
     "next": "16.1.6",
     "react": "19.2.3",

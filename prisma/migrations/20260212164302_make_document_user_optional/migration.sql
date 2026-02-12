@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Document" ALTER COLUMN "userId" DROP NOT NULL;

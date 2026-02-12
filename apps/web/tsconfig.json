@@ -21,6 +21,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@tax/adapters": ["../../packages/adapters/src"],
+      "@tax/core": ["../../packages/core/src"],
       "@tax/ingestion": ["../../packages/ingestion/src"]
     }
   },
