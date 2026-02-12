@@ -33,3 +33,6 @@ coverage/
 
 # Fixtures (may contain sensitive test data)
 fixtures/
+
+# Internal product docs (business logic, not for public repo)
+docs/product/refund-estimator.md
