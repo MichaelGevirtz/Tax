@@ -39,3 +39,13 @@ export {
   createParsingFailure,
   listFailuresByDocument,
 } from "./parsing-failure.repo";
+
+// Reminder repository
+export {
+  findRecentReminderByEmail,
+  createReminder,
+  findReminderByToken,
+  setReminderSentAt,
+  setReminderReturnedAt,
+  isTokenExpired,
+} from "./reminder.repo";

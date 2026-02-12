@@ -113,3 +113,17 @@ model ParsingFailure {
   @@index([documentId])
   @@index([documentId, parserVersion, stage])
 }
+
+model Reminder {
+  id          String    @id @default(cuid())
+  email       String    // @pii
+  token       String    @unique @default(cuid())
+  wizardState Json
+  softResult  Json
+  sentAt      DateTime?
+  returnedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email])
+  @@index([token])
+}
