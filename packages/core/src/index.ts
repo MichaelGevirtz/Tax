@@ -20,3 +20,19 @@ export {
   formatFieldValue,
 } from "./templates/form135-coordinates";
 export type { FieldCoordinate } from "./templates/form135-coordinates";
+
+// Tax Tables
+export { getBracketTable, getCreditTable, getSupportedYears } from "./tax-tables";
+export type { TaxBracketTable, CreditPointTable, TaxBracket } from "./tax-tables";
+
+// Calculators
+export { calculateTaxForYear } from "./calc/tax-calculator";
+export { calculateCreditPoints, getCreditValue } from "./calc/credit-calculator";
+export type { WizardCreditsInput } from "./calc/credit-calculator";
+
+// Refund Estimator
+export { estimateRefund } from "./calc/refund-estimator";
+export type { RefundEstimate, EstimatorInput, ConfidenceTier } from "./calc/refund-estimator";
+
+// Versions
+export { ESTIMATOR_VERSION } from "./versions/estimator-version";
