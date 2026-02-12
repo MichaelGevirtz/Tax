@@ -13,8 +13,9 @@ import {
   INITIAL_WIZARD_STATE,
   saveWizardState,
   loadWizardState,
-  clearWizardState,
+  saveSoftResult,
 } from "../../lib/wizard-state";
+import { evaluateSoftEligibility } from "../../lib/soft-evaluator";
 import { trackEvent, resetFlowId } from "../../lib/analytics";
 import styles from "./OnboardingWizard.module.css";
 
@@ -138,8 +139,9 @@ export function OnboardingWizard() {
         years_count: state.years.length,
         total_selections: countTotalSelections(state),
       });
-      clearWizardState();
-      router.push("/upload");
+      const softResult = evaluateSoftEligibility(state);
+      saveSoftResult(softResult);
+      router.push("/soft-result");
     }
   }, [currentStep, state, router]);
 

@@ -1,7 +1,10 @@
 /**
  * Wizard state type and localStorage persistence helper.
  * TASK-UI-004: 5-step onboarding wizard state model.
+ * TASK-016: soft result persistence.
  */
+
+import type { SoftResult } from "./soft-evaluator";
 
 export interface WizardState {
   employmentChanges: string[]; // Step 1
@@ -20,6 +23,7 @@ export const INITIAL_WIZARD_STATE: WizardState = {
 };
 
 const STORAGE_KEY = "taxback_precheck_v2";
+const SOFT_RESULT_KEY = "taxback_soft_result_v1";
 
 export function saveWizardState(state: WizardState): void {
   try {
@@ -42,6 +46,32 @@ export function loadWizardState(): WizardState | null {
 export function clearWizardState(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export function saveSoftResult(result: SoftResult): void {
+  try {
+    localStorage.setItem(SOFT_RESULT_KEY, JSON.stringify(result));
+  } catch {
+    // ignore
+  }
+}
+
+export function loadSoftResult(): SoftResult | null {
+  try {
+    const raw = localStorage.getItem(SOFT_RESULT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SoftResult;
+  } catch {
+    return null;
+  }
+}
+
+export function clearSoftResult(): void {
+  try {
+    localStorage.removeItem(SOFT_RESULT_KEY);
   } catch {
     // ignore
   }

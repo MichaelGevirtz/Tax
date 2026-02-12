@@ -59,7 +59,7 @@ Constraints:
 - No monetary amounts or ranges pre-payment.
 - Payment unlocks execution artifacts only (Form 135 + guide).
 
-2026-02-12 – Mandatory 106 Before Payment + Frictionless Upload Model
+## 2026-02-12 – Mandatory 106 Before Payment + Frictionless Upload Model
 
 Decision:
 
@@ -121,3 +121,19 @@ Prevents service drift.
 
 Strengthens trust through document-based validation before payment.
 
+## 2026-02-12 – Opt-in Email Capture at Soft Result (Remind Later)
+
+Decision:
+Users who cannot upload Form 106 immediately may opt-in to provide
+their email on the soft-result screen to receive a reminder.
+
+Constraints:
+- Email capture is opt-in only (secondary path, not required).
+- Users who upload immediately still do not provide email until after parsing.
+- No marketing emails. Single reminder only.
+- Email is PII — stored with @pii annotation (TASK-018).
+
+Reason:
+Users who complete the wizard but lack Form 106 at hand are the highest-intent
+non-converters. Without a return mechanism, they are lost. Email capture
+enables a single reminder with instructions on how to obtain Form 106.

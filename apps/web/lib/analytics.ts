@@ -43,6 +43,12 @@ interface AnalyticsEventOptional {
   last_step_number?: number;
   /** Step number navigated from (back action) — TASK-UI-004 */
   from_step_number?: number;
+  /** Soft eligibility confidence level — TASK-016 */
+  confidence?: "high" | "medium" | "low";
+  /** Whether user can proceed to upload — TASK-016 */
+  can_proceed?: boolean;
+  /** Number of eligibility reasons shown — TASK-016 */
+  reasons_count?: number;
 }
 
 export type AnalyticsEvent = AnalyticsEventBase & AnalyticsEventOptional;

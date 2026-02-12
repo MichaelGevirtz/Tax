@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft Result — Mock</title>
+<style>
+/* === Design Tokens (from globals.css) === */
+:root {
+  --color-bg: #FAFAF8;
+  --color-bg-white: #FFFFFF;
+  --color-bg-alt: #EDEAE6;
+  --color-text: #2D2A26;
+  --color-text-secondary: #6B6560;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-light: #EFF6FF;
+  --color-primary-subtle: #C9DDFB;
+  --color-border: #D5D0CA;
+  --color-success: #16A34A;
+  --color-warning: #EA580C;
+  --color-error: #E11D48;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --font-size-body: 17px;
+  --font-size-sm: 14px;
+  --font-size-xs: 13px;
+  --line-height-body: 1.6;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Mock Controls (not part of design) === */
+.mock-controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #1a1a2e;
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  z-index: 100;
+  font-size: 13px;
+  font-family: monospace;
+  direction: ltr;
+}
+.mock-controls button {
+  background: #374151;
+  color: #fff;
+  border: 1px solid #4B5563;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: monospace;
+  transition: background 0.15s;
+}
+.mock-controls button:hover { background: #4B5563; }
+.mock-controls button.active { background: var(--color-primary); border-color: var(--color-primary); }
+.mock-controls .separator { width: 1px; height: 24px; background: #374151; }
+
+/* === Page Container === */
+.page {
+  min-height: 100vh;
+  padding-top: 56px; /* mock controls height */
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-white);
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 580px;
+  width: 100%;
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+/* === Ring Section === */
+.ring-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block-end: var(--space-xl);
+  opacity: 0;
+  animation: fadeIn 250ms ease-out forwards;
+}
+
+.ring-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-block-end: var(--space-md);
+}
+
+.ring-svg {
+  width: 120px;
+  height: 120px;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: var(--color-bg-alt);
+  stroke-width: 6;
+}
+
+.ring-progress {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 314.16; /* 2 * π * 50 */
+  stroke-dashoffset: 314.16;
+  transition: none;
+}
+
+.ring-progress.animate {
+  animation: drawRing 600ms ease-out forwards;
+}
+
+.ring-progress.high { stroke: var(--color-success); }
+.ring-progress.medium { stroke: var(--color-warning); }
+.ring-progress.low { stroke: var(--color-text-secondary); }
+
+.ring-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0;
+  animation: fadeIn 200ms ease-out 400ms forwards;
+  white-space: nowrap;
+}
+
+.ring-label.high { color: #065f46; }
+.ring-label.medium { color: #92400e; }
+.ring-label.low { color: var(--color-text-secondary); }
+
+/* === Title === */
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
+  text-align: center;
+  letter-spacing: -0.01em;
+  margin-block-end: var(--space-lg);
+  opacity: 0;
+  animation: fadeIn 250ms ease-out 200ms forwards;
+}
+
+/* === Reasons === */
+.reasons {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-block-end: var(--space-xl);
+}
+
+.reason {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  color: var(--color-text);
+  opacity: 0;
+  animation: fadeSlideIn 200ms ease-out forwards;
+}
+
+.reason:nth-child(1) { animation-delay: 500ms; }
+.reason:nth-child(2) { animation-delay: 550ms; }
+.reason:nth-child(3) { animation-delay: 600ms; }
+.reason:nth-child(4) { animation-delay: 650ms; }
+
+.reason-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+  margin-block-start: 3px;
+}
+
+/* === Transparency === */
+.transparency {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-block-end: var(--space-xl);
+  opacity: 0;
+  animation: fadeIn 200ms ease-out 600ms forwards;
+}
+
+/* === Fork Cards === */
+.fork {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-block-end: var(--space-lg);
+  opacity: 0;
+  animation: fadeSlideIn 300ms ease-out 800ms forwards;
+}
+
+.fork-card {
+  background: var(--color-bg-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.fork-card:hover {
+  border-color: var(--color-primary-subtle);
+  box-shadow: var(--shadow-card);
+}
+
+.fork-card.primary:hover {
+  border-color: var(--color-primary);
+}
+
+.fork-card-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+  margin-block-end: var(--space-xs);
+}
+
+.fork-card.secondary .fork-card-icon {
+  color: var(--color-text-secondary);
+}
+
+.fork-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.fork-card-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.fork-card-btn {
+  margin-block-start: auto;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  text-align: center;
+}
+
+.fork-card-btn:active { transform: scale(0.98); }
+
+.fork-card.primary .fork-card-btn {
+  background: var(--color-primary);
+  color: #fff;
+}
+.fork-card.primary .fork-card-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+.fork-card.secondary .fork-card-btn {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-border);
+}
+.fork-card.secondary .fork-card-btn:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-subtle);
+}
+
+/* === Email Capture (secondary card) === */
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-block-start: auto;
+}
+
+.email-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-bg-white);
+  direction: ltr;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.email-input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.email-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.email-input.error {
+  border-color: var(--color-error);
+}
+
+.email-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  display: none;
+}
+
+.email-error.show {
+  display: block;
+}
+
+.email-submit {
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.email-submit:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-subtle);
+}
+
+.email-submit:active { transform: scale(0.98); }
+
+.email-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.email-privacy {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Success state */
+.email-success {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+  text-align: center;
+}
+
+.email-success.show {
+  display: flex;
+}
+
+.email-success-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--color-success);
+  animation: scaleIn 300ms ease-out;
+}
+
+.email-success-text {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.email-success-subtext {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* === 106 Guide === */
+.guide-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  width: 100%;
+  transition: color 0.15s;
+  opacity: 0;
+  animation: fadeIn 200ms ease-out 1000ms forwards;
+}
+
+.guide-toggle:hover { color: var(--color-primary-hover); }
+
+.guide-chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s;
+}
+
+.guide-toggle.open .guide-chevron {
+  transform: rotate(180deg);
+}
+
+.guide-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.25s ease-out, opacity 0.2s;
+  opacity: 0;
+}
+
+.guide-content.open {
+  max-height: 300px;
+  opacity: 1;
+}
+
+.guide-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-lg);
+}
+
+.guide-item {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.guide-item strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.guide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border);
+  flex-shrink: 0;
+  margin-block-start: 9px;
+}
+
+/* === Back link === */
+.back-link {
+  text-align: center;
+  margin-block-start: var(--space-md);
+  opacity: 0;
+  animation: fadeIn 200ms ease-out 1100ms forwards;
+}
+
+.back-link a {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.back-link a:hover { color: var(--color-text); }
+
+/* === Not Eligible State === */
+.not-eligible-body {
+  text-align: center;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-block-end: var(--space-xl);
+  opacity: 0;
+  animation: fadeIn 250ms ease-out 300ms forwards;
+}
+
+.not-eligible-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: center;
+  margin-block-start: auto;
+  padding-block-start: var(--space-xl);
+  opacity: 0;
+  animation: fadeSlideIn 300ms ease-out 500ms forwards;
+}
+
+.btn-primary {
+  width: 100%;
+  max-width: 360px;
+  padding: 14px 24px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--color-primary-hover); }
+
+.btn-secondary-text {
+  background: none;
+  border: none;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: var(--space-sm);
+}
+.btn-secondary-text:hover { color: var(--color-text); }
+
+/* === Tooltip (for copy link) === */
+.tooltip {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: #1a1a2e;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 50;
+}
+
+.tooltip.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* === Keyframes === */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawRing {
+  to { stroke-dashoffset: var(--ring-target); }
+}
+
+/* === Responsive === */
+@media (max-width: 639px) {
+  .container {
+    padding: var(--space-lg) var(--space-md);
+  }
+  .title { font-size: 21px; }
+  .fork {
+    grid-template-columns: 1fr;
+  }
+  .ring-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+  .ring-svg {
+    width: 100px;
+    height: 100px;
+  }
+  .ring-label { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* hide states */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Mock Controls -->
+<div class="mock-controls">
+  <span>MOCK:</span>
+  <button id="btn-high" class="active" onclick="showState('high')">High</button>
+  <button id="btn-medium" onclick="showState('medium')">Medium</button>
+  <button id="btn-low" onclick="showState('low')">Low</button>
+  <div class="separator"></div>
+  <button id="btn-not-eligible" onclick="showState('not-eligible')">Not Eligible</button>
+  <div class="separator"></div>
+  <button onclick="replayAnimations()">Replay</button>
+</div>
+
+<!-- ==================== ELIGIBLE STATE ==================== -->
+<div id="eligible-screen" class="page">
+  <div class="container">
+
+    <!-- 1. Confidence Ring -->
+    <div class="ring-section">
+      <div class="ring-wrapper">
+        <svg class="ring-svg" viewBox="0 0 108 108">
+          <circle class="ring-bg" cx="54" cy="54" r="50" />
+          <circle id="ring-progress" class="ring-progress high animate" cx="54" cy="54" r="50"
+            style="--ring-target: 47.12" />
+        </svg>
+        <div id="ring-label" class="ring-label high">סיכוי גבוה</div>
+      </div>
+    </div>
+
+    <!-- 2. Title -->
+    <h1 class="title">לפי התשובות שלך, קיימים מצבים שעשויים להוביל להחזר מס</h1>
+
+    <!-- 3. Reason Bullets -->
+    <ul class="reasons" id="reasons-list">
+      <li class="reason">
+        <svg class="reason-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span>החלפת מקום עבודה</span>
+      </li>
+      <li class="reason">
+        <svg class="reason-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span>תקופה ללא עבודה או עבודה חלקית</span>
+      </li>
+      <li class="reason">
+        <svg class="reason-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span>סיום תואר אקדמי</span>
+      </li>
+    </ul>
+
+    <!-- 4. Transparency -->
+    <p class="transparency">האימות הסופי מבוסס על נתוני טופס 106 בלבד.</p>
+
+    <!-- 5. Fork Cards -->
+    <div class="fork">
+      <div class="fork-card primary">
+        <svg class="fork-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 12 15 15"/>
+        </svg>
+        <div class="fork-card-title">יש לי טופס 106</div>
+        <div class="fork-card-subtitle">אפשר להעלות עכשיו ולקבל תוצאה תוך דקות</div>
+        <button class="fork-card-btn" onclick="alert('→ /upload-106')">העלאת טופס 106</button>
+      </div>
+      <div class="fork-card secondary">
+        <svg class="fork-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <polyline points="22 4 12 13 2 4"/>
+        </svg>
+        <div class="fork-card-title">עדיין אין לי את הטופס</div>
+        <div class="fork-card-subtitle">נשלח תזכורת עם הוראות פשוטות להשגת הטופס</div>
+
+        <!-- Email form (default state) -->
+        <div class="email-form" id="email-form">
+          <input
+            type="email"
+            class="email-input"
+            id="email-input"
+            placeholder="your@email.com"
+            autocomplete="email"
+            dir="ltr"
+          />
+          <span class="email-error" id="email-error">נא להזין כתובת מייל תקינה</span>
+          <button class="email-submit" id="email-submit" onclick="submitEmail()">שליחת תזכורת</button>
+          <span class="email-privacy">לא נשלח ספאם. תזכורת אחת בלבד.</span>
+        </div>
+
+        <!-- Success state (after submit) -->
+        <div class="email-success" id="email-success">
+          <svg class="email-success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12l3 3 5-5"/>
+          </svg>
+          <div class="email-success-text">התזכורת נשלחה</div>
+          <div class="email-success-subtext">
+            שלחנו מייל עם קישור חזרה והוראות<br/>להשגת טופס 106 מהמעסיק
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Guide Toggle -->
+    <button class="guide-toggle" id="guide-toggle" onclick="toggleGuide()">
+      איך משיגים טופס 106?
+      <svg class="guide-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+
+    <div class="guide-content" id="guide-content">
+      <ul class="guide-list">
+        <li class="guide-item">
+          <div class="guide-dot"></div>
+          <span><strong>ממערכת השכר של המעסיק</strong> — חלק מהמעסיקים מנפיקים דרך פורטל עובדים</span>
+        </li>
+        <li class="guide-item">
+          <div class="guide-dot"></div>
+          <span><strong>פנייה למחלקת שכר / HR</strong> — בדרך כלל מספיק מייל קצר</span>
+        </li>
+        <li class="guide-item">
+          <div class="guide-dot"></div>
+          <span><strong>מרואה החשבון של המעסיק</strong> — אם המעסיק משתמש ברו"ח חיצוני</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Back link -->
+    <div class="back-link">
+      <a href="#" onclick="alert('→ /precheck'); return false;">חזרה לשאלון</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== NOT ELIGIBLE STATE ==================== -->
+<div id="not-eligible-screen" class="page hidden">
+  <div class="container">
+
+    <div class="ring-section">
+      <div class="ring-wrapper">
+        <svg class="ring-svg" viewBox="0 0 108 108">
+          <circle class="ring-bg" cx="54" cy="54" r="50" />
+        </svg>
+        <div class="ring-label low" style="opacity:1; animation:none;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <h1 class="title" style="animation-delay: 100ms;">לפי התשובות שלך, לא זוהו סימנים ברורים לזכאות</h1>
+
+    <p class="not-eligible-body">
+      התוצאה מבוססת על השאלון בלבד.
+      ייתכן שיש מידע נוסף שלא בא לידי ביטוי בתשובות.
+    </p>
+
+    <div class="not-eligible-actions">
+      <button class="btn-primary" onclick="alert('→ /precheck')">לעדכן תשובות</button>
+      <button class="btn-secondary-text" onclick="alert('→ /precheck step 5')">לבדוק שנה אחרת</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// Ring offset targets: circumference = 2 * π * 50 = 314.16
+// high = 85% fill → offset = 314.16 * 0.15 = 47.12
+// medium = 60% fill → offset = 314.16 * 0.40 = 125.66
+// low = 35% fill → offset = 314.16 * 0.65 = 204.20
+const RING_CONFIG = {
+  high:   { target: 47.12,  label: 'סיכוי גבוה',  cls: 'high' },
+  medium: { target: 125.66, label: 'סיכוי בינוני', cls: 'medium' },
+  low:    { target: 204.20, label: 'סיכוי קיים',   cls: 'low' },
+};
+
+const REASONS_BY_CONFIDENCE = {
+  high: [
+    'החלפת מקום עבודה',
+    'תקופה ללא עבודה או עבודה חלקית',
+    'סיום תואר אקדמי',
+  ],
+  medium: [
+    'שינוי בשכר במהלך השנה',
+    'ביטוח חיים פרטי',
+  ],
+  low: [
+    'ייתכנו הטבות מס שלא נוצלו',
+  ],
+};
+
+let currentState = 'high';
+
+function showState(state) {
+  // Update control buttons
+  document.querySelectorAll('.mock-controls button').forEach(b => b.classList.remove('active'));
+  const btnId = state === 'not-eligible' ? 'btn-not-eligible' : `btn-${state}`;
+  document.getElementById(btnId).classList.add('active');
+
+  if (state === 'not-eligible') {
+    document.getElementById('eligible-screen').classList.add('hidden');
+    document.getElementById('not-eligible-screen').classList.remove('hidden');
+    currentState = state;
+    return;
+  }
+
+  document.getElementById('eligible-screen').classList.remove('hidden');
+  document.getElementById('not-eligible-screen').classList.add('hidden');
+  currentState = state;
+
+  const cfg = RING_CONFIG[state];
+
+  // Update ring
+  const ring = document.getElementById('ring-progress');
+  ring.className = `ring-progress ${cfg.cls} animate`;
+  ring.style.setProperty('--ring-target', cfg.target);
+
+  // Update label
+  const label = document.getElementById('ring-label');
+  label.className = `ring-label ${cfg.cls}`;
+  label.textContent = cfg.label;
+
+  // Update reasons
+  const list = document.getElementById('reasons-list');
+  const reasons = REASONS_BY_CONFIDENCE[state];
+  list.innerHTML = reasons.map(r => `
+    <li class="reason">
+      <svg class="reason-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>${r}</span>
+    </li>
+  `).join('');
+
+  replayAnimations();
+}
+
+function replayAnimations() {
+  const container = document.querySelector('#eligible-screen .container');
+  if (!container) return;
+
+  // Force re-trigger by removing and re-adding the container
+  const parent = container.parentNode;
+  const clone = container.cloneNode(true);
+  parent.replaceChild(clone, container);
+
+  // Re-set ring animation
+  const ring = clone.querySelector('#ring-progress');
+  if (ring && currentState !== 'not-eligible') {
+    const cfg = RING_CONFIG[currentState];
+    ring.style.setProperty('--ring-target', cfg.target);
+    ring.classList.remove('animate');
+    void ring.offsetWidth; // force reflow
+    ring.classList.add('animate');
+  }
+
+  // Re-bind guide toggle
+  const toggle = clone.querySelector('#guide-toggle');
+  const content = clone.querySelector('#guide-content');
+  if (toggle && content) {
+    toggle.onclick = function() {
+      this.classList.toggle('open');
+      content.classList.toggle('open');
+    };
+  }
+
+  // Reset email form
+  const emailForm = clone.querySelector('#email-form');
+  const emailSuccess = clone.querySelector('#email-success');
+  const emailInput = clone.querySelector('#email-input');
+  const emailBtn = clone.querySelector('#email-submit');
+  const emailError = clone.querySelector('#email-error');
+  if (emailForm) {
+    emailForm.style.display = '';
+    emailBtn.disabled = false;
+    emailBtn.textContent = 'שליחת תזכורת';
+    emailBtn.onclick = submitEmail;
+    emailInput.value = '';
+    emailInput.classList.remove('error');
+    emailError.classList.remove('show');
+  }
+  if (emailSuccess) emailSuccess.classList.remove('show');
+}
+
+function toggleGuide() {
+  const toggle = document.getElementById('guide-toggle');
+  const content = document.getElementById('guide-content');
+  toggle.classList.toggle('open');
+  content.classList.toggle('open');
+}
+
+function submitEmail() {
+  const input = document.getElementById('email-input');
+  const error = document.getElementById('email-error');
+  const form = document.getElementById('email-form');
+  const success = document.getElementById('email-success');
+  const value = input.value.trim();
+
+  // Basic email validation
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+  if (!isValid) {
+    input.classList.add('error');
+    error.classList.add('show');
+    input.focus();
+    return;
+  }
+
+  // Clear errors
+  input.classList.remove('error');
+  error.classList.remove('show');
+
+  // Simulate submit — disable button briefly
+  const btn = document.getElementById('email-submit');
+  btn.disabled = true;
+  btn.textContent = 'שולח...';
+
+  setTimeout(() => {
+    // Hide form, show success
+    form.style.display = 'none';
+    success.classList.add('show');
+
+    // Show toast
+    const tooltip = document.getElementById('tooltip');
+    tooltip.textContent = 'התזכורת נשלחה ל-' + value;
+    tooltip.classList.add('show');
+    setTimeout(() => tooltip.classList.remove('show'), 3000);
+  }, 800);
+}
+
+// Clear error state on input
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'email-input') {
+    e.target.classList.remove('error');
+    const error = document.getElementById('email-error');
+    if (error) error.classList.remove('show');
+  }
+});
+</script>
+
+</body>
+</html>
