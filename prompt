@@ -32,8 +32,6 @@ project-root/
 ├── tasks/
 │   ├── current/          # active tasks (can have 2 at once)
 │   └── completed/        # archived finished tasks
-├── docs/
-│   └── api.md            # updated after every new endpoint
 ├── backend/
 │   ├── src/
 │   │   ├── routes/
@@ -107,7 +105,7 @@ Can run in parallel with: [task ID or NONE]
 After every completed task, update:
 - memory-bank/progress.md — add what was built
 - memory-bank/decisions.md — add any architectural decisions made
-- docs/api.md — add any new endpoints
+
 
 ---
 
