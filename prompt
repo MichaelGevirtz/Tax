@@ -114,7 +114,7 @@ After every completed task, update:
 # STACK
 - Backend: Node.js, Express
 - Frontend: React
-- Testing: Jest (unit), Supertest (e2e API), Playwright or Cypress (e2e UI)
+- Testing: Jest (unit), Supertest (e2e API)
 - [add DB here when known]
 
 ---
