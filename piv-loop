@@ -162,7 +162,7 @@ a `## Development Process` section with these rules:
   - Frontend components: Vitest + React Testing Library
   - Backend unit + API e2e: Jest + Supertest
 - Package manager: npm
-- DB: [to be determined during clarifying questions]
+
 
 ---
 
@@ -171,8 +171,6 @@ a `## Development Process` section with these rules:
 The project goal is:
 **[PASTE THE INTERVIEW TASK HERE]**
 
-If the project goal above is still a placeholder, ask me for the
-task description before doing anything else.
 
 Step 1: Ask me clarifying questions — **one at a time**, waiting for
         each answer before asking the next. Stop when you have enough
