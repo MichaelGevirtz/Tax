@@ -171,15 +171,11 @@ a `## Development Process` section with these rules:
 The project goal is:
 **[PASTE THE INTERVIEW TASK HERE]**
 
-
-Step 1: Ask me clarifying questions — **one at a time**, waiting for
-        each answer before asking the next. Stop when you have enough
-        to write a complete context.md.
-Step 2: Write `memory-bank/context.md` with everything we know
+Step 1: Write `memory-bank/context.md` with everything we know
         (including the Development Process section).
-Step 3: Break the project into an ordered task list — titles and
+Step 2: Break the project into an ordered task list — titles and
         one-line goals only, no code.
-Step 4: Write the first task file into `tasks/current/task-01.md`
+Step 3: Write the first task file into `tasks/current/task-01.md`
         and wait for my approval.
 
 Do not write any code until I approve a task file.
