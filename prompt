@@ -78,6 +78,8 @@ Can run in parallel with: [task ID or NONE]
 - [ ] [test case 1]
 - [ ] [test case 2]
 
+## componets UI tests
+
 ### E2E Tests
 - [ ] [user flow or API call that proves it works]
 
