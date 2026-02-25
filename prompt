@@ -17,7 +17,9 @@ We will build this project together using a strict PIV (Plan → Implement → V
 5. Tasks should be small enough to complete in 5-8 minutes.
    I may run 2 tasks in parallel — so tasks must be fully independent with no shared file conflicts.
 
-6. Update .claude/CLAUDE.md with the build, test.
+6. Always update .claude/CLAUDE.md with the exact npm commands for build, test, and lint as the project evolves.
+
+7. Production Standards: All code must include basic structured logging, error boundaries, and input validation. If a task involves a shared resource, you must explicitly address race conditions in the implementation notes.
 
 ---
 
