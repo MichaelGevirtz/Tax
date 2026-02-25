@@ -17,6 +17,8 @@ We will build this project together using a strict PIV (Plan → Implement → V
 5. Tasks should be small enough to complete in 5-8 minutes.
    I may run 2 tasks in parallel — so tasks must be fully independent with no shared file conflicts.
 
+6. Update .claude/CLAUDE.md with the build, test.
+
 ---
 
 # PROJECT STRUCTURE TO CREATE
