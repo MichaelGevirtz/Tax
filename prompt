@@ -80,10 +80,14 @@ Can run in parallel with: [task ID or NONE]
 - [ ] [test case 1]
 - [ ] [test case 2]
 
-## componets UI tests
+## UI Tests
+### Component Tests
+- Validate loading state
+- Validate success state
 
 ### E2E Tests
 - [ ] [user flow or API call that proves it works]
+- [ ] [Frontend → API round trip]
 
 ### Success Criteria
 - [ ] All unit tests pass
