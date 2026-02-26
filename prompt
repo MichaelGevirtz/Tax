@@ -82,7 +82,7 @@ Can run in parallel with: [task ID or NONE]
 - [ ] [test case 1]
 - [ ] [test case 2]
 
-## UI Tests
+### UI Tests
 ### Component Tests
 - Validate loading state
 - Validate success state
